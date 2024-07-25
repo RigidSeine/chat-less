@@ -12,6 +12,9 @@
 - HarperDB no longer has a free tier. And its lowest tier is hella expensive. So pivoting to MongoDB (Atlas) and trying out NoSQL - which requires getting an account on MongoDB and running `npm install mongodb` (since we're using Node.js).
 - New directory created in `src`: `pages\home` along with two files `index.js` and `styles.module.css`.
 - `styles.module.css` is a CSS module which allows for local scopes for CSS. In other words, this allows for different CSS namespaces. So you can define a button class in two different CSS modules (e.g. `styles1.module.css` and `styles2.module.css`) and use either one by using `${styles1.button}` or `${styles2.button}`.
+- An `index.js` file in the `./pages/home` directory creates the Home module and is exported for use in the `App.jsx` file.
+- The `App.jsx` is where the routing is defined by importing `react-router-dom` module.
+- Tried running the app and encountered an error saying that my `.pages/home/index.js` was using invalid `.jsx` syntax. And that was because the file extension was incorrect!
 
 # MongoDB
 - Connecting to it:
