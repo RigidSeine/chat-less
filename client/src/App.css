@@ -98,3 +98,7 @@ body {
   background: rgb(0, 24, 111);
   color: #fff;
 }
+
+.width-full{
+  width: 100%;
+}

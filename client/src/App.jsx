@@ -1,18 +1,32 @@
 //../src/App.jsx
 
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
+import { useState } from 'react'
+import io from 'socket.io-client'
 import Home from './pages/home'
 
+const socket = io('http://localhost:5173/');
+
 const App = () => {
+  const[username, setUsername] = useState('');
+  const[room, setRoom] = useState('');
+
   return(
     <Router>
         <div className='App'>
           <Routes>
-            <Route path='/' element={<Home />}/>
+            <Route 
+              path='/' 
+              element={
+                <Home //Pass the state of the constants down to Home - i.e. use Props
+                  username={username}
+                  setUsername={setUsername}
+                  room={room}
+                  setRoom={setRoom}
+                  socket={socket}
+                  />
+              }/>
           </Routes>
         </div>
     </Router>
