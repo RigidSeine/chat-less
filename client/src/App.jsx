@@ -16,7 +16,7 @@ const App = () => {
     <Router>
         <div className='App'>
           <Routes>
-            <Route 
+            <Route //Declare what element is displayed at this path
               path='/' 
               element={
                 <Home //Pass the state of the constants down to Home - i.e. use Props
