@@ -1,4 +1,4 @@
-# Installation
+# Installation - Client-side Dependencies
 - Installed Node.js via .msi file.
 - Tried running `npx create-react-app client` only to get an error:
 `ENOENT: no such file or directory, lstat 'C:\Users\User\AppData\Roaming\npm'`
@@ -10,6 +10,16 @@
   - `react-router-dom` is the library for routing in React. It allows the navigation and rendering of diferent components depending on the URL. You get to route to different Views essentially.
   - `socket.io-client` is the client-side library for Socket.IO. Socket.IO is the crux of this app, allowing for real-time event-based communication between the client (browser) and the server. Used in place of standard HTTP requests. Socket.IO uses WebSocket connection whenever possible but will use HTTP long-polling as fallback.
 - HarperDB no longer has a free tier. And its lowest tier is hella expensive. So pivoting to MongoDB (Atlas) and trying out NoSQL - which requires getting an account on MongoDB and running `npm install mongodb` (since we're using Node.js).
+
+# Installation - Server-side Dependencies
+- Ran `npm i axios cors express socket.io dotenv`
+  - Axios is for making API requests
+  - CORS is Cross-Origin Resource Sharing - allowing for requests to be made from one website to another in the browser. This is required for Socket.IO.
+  - Express is a convenient NodeJS framework.
+  - Dotenv is for loading environment variables (e.g. Secrets!)
+- Also ran `npm i -D nodemon`
+  - The `-D` argument is to install the package as a dev dependency.
+  - Nodemon saves us from having to restart the server for every change.
 
 # Development - Home Page
 - New directory created in `src`: `pages\home` along with two files `index.js` and `styles.module.css`.
