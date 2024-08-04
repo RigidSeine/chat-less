@@ -14,8 +14,8 @@
 # Installation - Server-side Dependencies
 - Ran `npm i axios cors express socket.io dotenv`
   - Axios is for making API requests
-  - CORS is Cross-Origin Resource Sharing - allowing for requests to be made from one website to another in the browser. This is required for Socket.IO.
-  - Express is a convenient NodeJS framework.
+  - CORS is Cross-Origin Resource Sharing - allowing for HTTP requests to be made from one website to another in the browser. This is required for Socket.IO. This can be implemented securely by using a whitelist using the `Access-Control-Allow-Origin` request header.
+  - Express is a convenient NodeJS framework for doing back-end (in contrast to using React for front-end. Although we're using React routing for this one). We want Express to make use of middleware.
   - Dotenv is for loading environment variables (e.g. Secrets!)
 - Also ran `npm i -D nodemon`
   - The `-D` argument is to install the package as a dev dependency.
@@ -75,7 +75,16 @@ const Home = ({username, setUsername, room, setRoom, socket}) => {
 };
 ```
 
-
+# Development - Server-side
+- It all starts with an `index` file. In this case, it's an `index.jsx` file at the root of the server folder. Populated within is the barebones of an Express app which can be found on the [Express website](https://expressjs.com/en/starter/hello-world.html).
+- In order to get this up and running, a script needs to be defined in the `package.json` file (also at the root of the server folder). This looks like:
+```json
+  "scripts": {
+    "dev": "nodemon index.jsx"
+  }
+```
+- This defines a script called `dev` that runs the `nodemon` command on `index.jsx` since it's the entry point of this app. This is how we get `nodemon` to monitor and register changes in our Express app without needing to (manually) restart the server.
+- The script is run by using the CLI command `npm run dev`. Hey wait a minute, this is similar to running the client React app.
 
 # MongoDB
 - Connecting to it:

@@ -6,7 +6,7 @@ import { useState } from 'react'
 import io from 'socket.io-client'
 import Home from './pages/home'
 
-const socket = io('http://localhost:5173/');
+const socket = io.connect('http://localhost:4000/');
 
 const App = () => {
   const[username, setUsername] = useState('');
