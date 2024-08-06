@@ -86,6 +86,25 @@ const Home = ({username, setUsername, room, setRoom, socket}) => {
 - This defines a script called `dev` that runs the `nodemon` command on `index.jsx` since it's the entry point of this app. This is how we get `nodemon` to monitor and register changes in our Express app without needing to (manually) restart the server.
 - The script is run by using the CLI command `npm run dev`. Hey wait a minute, this is similar to running the client React app.
 
+# What the Hell is a Socket?
+- According to the (Socket.IO website)[https://socket.io/docs/v4/how-it-works/], it's a bidirectional channel between a Socket.IO server (Node.js) and Socket.IO client (browser, Node.js) established with a **Websocket connection** whenever possible, and will use HTTP long-polling as fallback. So it's a **websocket** that resorts to HTTP long-polling as a last resort for transporting data.
+## So What's a Websocket? 
+- To understand what a websocket is, we can look to using a HTTP requests as a vehicle for comparison.
+### HTTP
+- As we know, HTTP, or Hypertext Transfer Protocol, is an internet protocol which acts the basis for how we surf the net.
+- We use it to load webpages using hypertext links. They always start with `http://` or `https://`
+- It's unidirectional communication protocol where a **client** (e.g. a browser on a computer) sends a **request** (visiting a website) to a **server** (e.g. a machine that is more or less a computer hosting said website) and the **server** sends back a **response** (e.g. the home page of the website).
+- After a response is sent, the connection between the client and server is closed. And so, a new HTTP (or HTTPS) request from a client will reesult in a new connection to the server.
+- HTTP is a stateless protocol that runs on top of TCP (Transmission Control Protocol). Stateless meaning the server doesn't need to retain the information of a session or the status of every communicatiing partner across requests. This is more important when we get to Websocket. [TODO: more info required on TCP]
+- Each HTTP request comprises the protocol version (e.g. HTTP/1.1, HTTP/2), the method (GET, POST, etc.), headers (e.g. content type, content length), host information, etc.
+### Websocket
+- On the other hand, **Websocket** is also a communication protocol for communicating between a client and a server.
+- Websocket however, is bidirectional, stateful protocol so the connection between a client and server is kept alive until it is terminated by either party.
+- Websockets start with `ws://` or `wss://`. Not that you're likely to see a URL starting with these unless you work with them.
+- The bidirectionality and statefulness allows for two-way realtime communication between the client and server. It's as simple as `websocket.send(data);`.
+- Websocket connection also happens over a TCP connection.
+### HTTP Long-Polling
+
 # MongoDB
 - Connecting to it:
 ```js

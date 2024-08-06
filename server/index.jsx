@@ -20,6 +20,12 @@ const io = new Server(server, {
 //Listen for when a client connects via socket.io-client.
 io.on('connection', (socket) => {
     console.log(`User connected with ID: ${socket.id}`);
+
+    socket.on('join_room', (data) => {
+        const {username, room}  = data; //Expecting username and room to be returned by the client
+        socket.join(room); 
+    }
+    )
 });
 
 //Set up the port that server is running on
