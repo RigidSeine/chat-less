@@ -14,9 +14,9 @@
 # Installation - Server-side Dependencies
 - Ran `npm i axios cors express socket.io dotenv`
   - Axios is for making API requests
-  - CORS is Cross-Origin Resource Sharing - allowing for HTTP requests to be made from one website to another in the browser. This is required for Socket.IO. This can be implemented securely by using a whitelist using the `Access-Control-Allow-Origin` request header.
-  - Express is a convenient NodeJS framework for doing back-end (in contrast to using React for front-end. Although we're using React routing for this one). We want Express to make use of middleware.
-  - Dotenv is for loading environment variables (e.g. Secrets!)
+  - **CORS** is Cross-Origin Resource Sharing - allowing for HTTP requests to be made from one website to another in the browser. This is required for Socket.IO. This can be implemented securely by using a whitelist using the `Access-Control-Allow-Origin` request header.
+  - **Express** is a convenient NodeJS framework for doing back-end (in contrast to using React for front-end. Although we're using React routing for this one). We want Express to make use of middleware.
+  - **Dotenv** is for loading environment variables (e.g. Secrets!)
 - Also ran `npm i -D nodemon`
   - The `-D` argument is to install the package as a dev dependency.
   - Nodemon saves us from having to restart the server for every change.
@@ -97,13 +97,26 @@ const Home = ({username, setUsername, room, setRoom, socket}) => {
 - After a response is sent, the connection between the client and server is closed. And so, a new HTTP (or HTTPS) request from a client will reesult in a new connection to the server.
 - HTTP is a stateless protocol that runs on top of TCP (Transmission Control Protocol). Stateless meaning the server doesn't need to retain the information of a session or the status of every communicatiing partner across requests. This is more important when we get to Websocket. [TODO: more info required on TCP]
 - Each HTTP request comprises the protocol version (e.g. HTTP/1.1, HTTP/2), the method (GET, POST, etc.), headers (e.g. content type, content length), host information, etc.
+
 ### Websocket
 - On the other hand, **Websocket** is also a communication protocol for communicating between a client and a server.
 - Websocket however, is bidirectional, stateful protocol so the connection between a client and server is kept alive until it is terminated by either party.
 - Websockets start with `ws://` or `wss://`. Not that you're likely to see a URL starting with these unless you work with them.
 - The bidirectionality and statefulness allows for two-way realtime communication between the client and server. It's as simple as `websocket.send(data);`.
 - Websocket connection also happens over a TCP connection.
+
+### TCP
+- Another mainstay of the internet, TCP (Transmission Control Protocol) is a protocol that enables application programs and computing devices to exchange messages over a network by breaking messages down into data packets and rebuilding the messages on the other side. A TCP/IP network uses IP (Internet Protocol) to make sure the data packets reach the right address.
+- The term, "handshake" may come to mind when TCP is mentioned. The handshake is the method of establishing a connection between two devices on a TCP/IP network. It works in 3 steps:
+1. Device 1 sends a `SYN` (Synchronize) packet to Device 2.
+2. Device 2 sends a `SYN-ACK` (Synchronize-Acknowledge) packet to Device 1.
+3. Finally, Device 1 sends back an `ACK` (Acknowledge) packet to Device 2. The connection is then established.
+- Incidentally, hackers and botnets can stealthily ping to see if a server port is open by completing the first two steps of the handshake and quitting before the third step is complete. Talk about tricky.
+
 ### HTTP Long-Polling
+- Also a way of doing real-time updates between a client and a server. Long-polling is done by maintaining a request until new data is retrieved from the server or until timeout.
+- If new data is available, the server responds with the updated information and a new request is sent by the client to continue the cycle.
+- Long-polling however, has greater latency and resource consumption than websockets.
 
 # MongoDB
 - Connecting to it:
