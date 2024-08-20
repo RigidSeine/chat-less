@@ -74,6 +74,41 @@ const Home = ({username, setUsername, room, setRoom, socket}) => {
   //...
 };
 ```
+### Function Components
+- It's all function components here in the present.
+- They're essentially JS functions that return HTML.
+- The function names must be capitalised.
+- Then they're rendered.
+- Like so:
+```js
+//../src/App.jsx
+
+const App = () => {
+  const[username, setUsername] = useState('');
+  const[room, setRoom] = useState('');
+
+  return(
+    <h1>HELLO MORTAL</h1>;
+  );
+};
+
+export default App;
+
+```
+
+```js
+//..src/main.jsx
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+```
 
 # Development - Server-side
 - It all starts with an `index` file. In this case, it's an `index.jsx` file at the root of the server folder. Populated within is the barebones of an Express app which can be found on the [Express website](https://expressjs.com/en/starter/hello-world.html).
@@ -85,6 +120,39 @@ const Home = ({username, setUsername, room, setRoom, socket}) => {
 ```
 - This defines a script called `dev` that runs the `nodemon` command on `index.jsx` since it's the entry point of this app. This is how we get `nodemon` to monitor and register changes in our Express app without needing to (manually) restart the server.
 - The script is run by using the CLI command `npm run dev`. Hey wait a minute, this is similar to running the client React app.
+
+## Hooks
+- As per W3, hooks allow function components to have access to state and other React features.
+- The common one is `useState`  and it's typically used like `const [VALUE,setVALUE] = useState(DEFAULT_VALUE)`;
+- Another one is `useEffect` which allows for the use of side effects. Examples of side effects include: fetching data, directly updating the DOM, and timers.
+
+Speaking of timers:
+```js
+import { useState, useEffect } from "react";
+import ReactDOM from "react-dom/client";
+
+function Timer() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let timer = setTimeout(() => { //Create this timer on render that runs setCount every 1000 seconds
+    setCount((count) => count + 1);
+  }, 1000);
+
+  return () => clearTimeout(timer) //Clean up function that's run when the component is unmounted
+  }, []); //An empty array is passed in as a dependency so useEffect will only be run once. 
+          //If nothing is passed in, then useEffect will run every render and that could be any time a value changes on screen
+          //A dependency such as `count` could be passed into the array and useEffect will run every time `count` changes.
+
+  return <h1>I've rendered {count} times!</h1>;
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<Timer />);
+```
+
+## Messages (Chat History)
+
 
 # What the Hell is a Socket?
 - According to the (Socket.IO website)[https://socket.io/docs/v4/how-it-works/], it's a bidirectional channel between a Socket.IO server (Node.js) and Socket.IO client (browser, Node.js) established with a **Websocket connection** whenever possible, and will use HTTP long-polling as fallback. So it's a **websocket** that resorts to HTTP long-polling as a last resort for transporting data.

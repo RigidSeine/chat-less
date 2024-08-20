@@ -3,10 +3,10 @@
 import styles from './style.modules.css';
 import {useState, useEffect} from 'react';
 
-const messages = ({ socket }) => { //Unpack the socket property from the passed in object i.e. destructuring
+const Messages = ({ socket }) => { //Unpack the socket property from the passed in object i.e. destructuring
     const [messagesReceived, setMessagesReceived] = useState([]); //Array for messagesReceived
 
-    // Runs whenever a socket event is received from the server
+    // Runs whenever a socket event is received from the server by passing the socket as the dependency into useEffect
     useEffect(() => {
         socket.on('receive_message', (data) => {
             console.log(data);
@@ -20,7 +20,7 @@ const messages = ({ socket }) => { //Unpack the socket property from the passed 
             ]);
         });
 
-        //Remove event listener on component unmount
+        //Remove event listener on component unmount as a form of cleanup
         return () => socket.off('receive_message');
 
     }, [socket]);
