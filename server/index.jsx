@@ -17,7 +17,7 @@ const io = new Server(server, {
     }
 });
 
-const chatbot = 'ChatBot';
+const chatbot = 'ChatBot'; //Chatbot for making room-wide announcements
 let chatRoom = '';
 let allUsers = [];
 
@@ -42,8 +42,8 @@ io.on('connection', (socket) => {
         allUsers.push({id: socket.id, username, room});
         
         var chatRoomUsers = allUsers.filter((user) => user.room == room);
-        socket.to(room).emit('chatroom_users', chatRoomUsers);
-        socket.emit('chatroom_users', chatRoomUsers); //Why global emit
+        socket.to(room).emit('chatroom_users', chatRoomUsers); //Emit the list of chatroom users so that the list of users can be displayed in the room on the frontend
+        socket.emit('chatroom_users', chatRoomUsers);
     }
     );
 

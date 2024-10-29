@@ -10,7 +10,8 @@ const Messages = ({ socket }) => { //Unpack the socket property from the passed 
     useEffect(() => {
         socket.on('receive_message', (data) => {
             console.log(data);
-            setMessagesReceived((state) => [
+
+            setMessagesReceived((state) => [ //Append a new message object to messagesReceived from the data argument
                 ...state,
                 {
                     message: data.message,
@@ -18,6 +19,7 @@ const Messages = ({ socket }) => { //Unpack the socket property from the passed 
                     createdTime: data.createdTime
                 },
             ]);
+
         });
 
         //Remove event listener on component unmount as a form of cleanup

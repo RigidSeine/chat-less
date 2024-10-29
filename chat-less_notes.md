@@ -28,7 +28,9 @@
 - The `App.jsx` is where the routing is defined by importing `react-router-dom` module.
 - [Error] Tried running the app and encountered an error saying that my `.pages/home/index.js` was using invalid `.jsx` syntax. And that was because the file extension was incorrect!
 - The Home module contains the HTML for the homepage.
+
 ![Homepage](/Notes_images/homepage-dev-1.png)
+
 - Functionality for the homepage is added to the `App.jsx` file since other pages in the app will require access to the `username` and `chat room` values.
 - Handling a lot of this will be:
   - States for storing the submitted values
@@ -152,7 +154,11 @@ root.render(<Timer />);
 ```
 
 ## Messages (Chat History)
-
+- Making use of React to split the page up into components
+  - A: A sidebar on the left displaying the name of the room, the list of users and an action(s) for the room (i.e. leave)
+  - B: The chat history istself.
+  - C: The message bar and the button to send a message.
+   ![Things to in the chatroom: 1. Leave.](thingstodoleave.png)\
 
 # What the Hell is a Socket?
 - According to the (Socket.IO website)[https://socket.io/docs/v4/how-it-works/], it's a bidirectional channel between a Socket.IO server (Node.js) and Socket.IO client (browser, Node.js) established with a **Websocket connection** whenever possible, and will use HTTP long-polling as fallback. So it's a **websocket** that resorts to HTTP long-polling as a last resort for transporting data.
