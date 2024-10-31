@@ -159,6 +159,25 @@ root.render(<Timer />);
   - B: The chat history istself.
   - C: The message bar and the button to send a message.
    ![Things to in the chatroom: 1. Leave.](thingstodoleave.png)\
+- Built the messages part and tried to test joining a room only to get a blank page on app startup.
+  - Check the console for errors, kids. I found a couple of errors of includes not being written and so a couple of pages couldn't be found.
+  - And if that still doesn't work then check you CSS modules. Accidentally had one spelt as *.module**s**.css instead of *.module.css which ruined everything.
+  - Also had issues trying to get the client and server to communicate with each other.
+  - The server must have some arbitary port number that it listens on, but it must be separate to the client.
+  - On the server-side, the client's port number must be added to the Cross-Origin (COR) whitelist.
+    - The client's port number is just decided by the framework when you run the app's client
+  - On the client-side, the socket must connect to the server-side's port number.
+  - Now, the important part - both the server and client must be running.
+  - Behaviour is then driven from the client side.
+
+# Javascript Quirky Operators
+## Destructuring
+- `{socket}` is destructuring the socket object to extract the object's properties.
+- This can be done with an array as well using the spread operator.
+
+## Spread
+- `...myArray` - copies and returns the elements of the array for use. 
+- **Warning**: Usage of spread on large arrays can lead to stack overflows and not the good kind.
 
 # What the Hell is a Socket?
 - According to the (Socket.IO website)[https://socket.io/docs/v4/how-it-works/], it's a bidirectional channel between a Socket.IO server (Node.js) and Socket.IO client (browser, Node.js) established with a **Websocket connection** whenever possible, and will use HTTP long-polling as fallback. So it's a **websocket** that resorts to HTTP long-polling as a last resort for transporting data.
