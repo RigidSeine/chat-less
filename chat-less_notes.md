@@ -169,6 +169,7 @@ root.render(<Timer />);
   - On the client-side, the socket must connect to the server-side's port number.
   - Now, the important part - both the server and client must be running.
   - Behaviour is then driven from the client side.
+- New problem: finding issue with `socket.on('receive_message', ())` not firing
 
 # Javascript Quirky Operators
 ## Destructuring
