@@ -169,7 +169,8 @@ root.render(<Timer />);
   - On the client-side, the socket must connect to the server-side's port number.
   - Now, the important part - both the server and client must be running.
   - Behaviour is then driven from the client side.
-- New problem: finding issue with `socket.on('receive_message', ())` not firing
+- New problem: finding issue with `socket.on('receive_message', ())` not firing.
+  - **Result**: The event was firing, there was just a missing event not included the code that welcomes the new user. Good to explore the socket documentation a bit more though.
 
 # Javascript Quirky Operators
 ## Destructuring

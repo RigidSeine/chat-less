@@ -1,14 +1,14 @@
-// client/src/pages/chat/messages.js
+// client/src/pages/chat/messages.jsx
 
 import styles from './styles.module.css';
 import {useState, useEffect} from 'react';
 
 const Messages = ({ socket }) => { //Unpack the socket property from the passed in object i.e. destructuring
     const [messagesReceived, setMessagesReceived] = useState([]); //Array for messagesReceived
+    
     // Runs when the Messages component is mounted
     useEffect(() => {
         socket.on('receive_message', (data) => {
-            console.log(data);
             
             //Append a new message object to messagesReceived from the data argument
             setMessagesReceived((state) => [ //Using state as the state updater to separate it from useEffect's dependencies
@@ -16,7 +16,7 @@ const Messages = ({ socket }) => { //Unpack the socket property from the passed 
                 {
                     message: data.message,
                     username: data.username,
-                    __createdtime__: data.__createdtime__
+                    createdTime: data.createdTime
                 },
             ]);
 
@@ -39,7 +39,7 @@ const Messages = ({ socket }) => { //Unpack the socket property from the passed 
                 <div className={styles.message} key={i}>
                     <div style={{ display: 'flex', justifyContent: 'space-between'}}>
                         <span className={styles.msgMeta}>{msg.username}</span>
-                        <span className={styles.msgMeta}>{formatDateFromTimestamp(msg.__createdtime__)}</span>
+                        <span className={styles.msgMeta}>{formatDateFromTimestamp(msg.createdTime)}</span>
                     </div>
                     <p className={styles.msgText}>{msg.message}</p>
                     <br />
