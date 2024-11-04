@@ -7,7 +7,7 @@ const SendMessage = ({ socket, username, room}) => {
     const [message, setMessage] = useState('');
 
     const sendMessage = () => {
-        if (message.trim != '') {
+        if (message.trim() != '') {
             const createdTime = Date.now();
 
             //Send a message to the server. We can't specify who we send the message to
