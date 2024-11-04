@@ -13,7 +13,7 @@
 
 # Installation - Server-side Dependencies
 - Ran `npm i axios cors express socket.io dotenv`
-  - Axios is for making API requests
+  - **Axios** is for making API requests, specifically async HTTP requests (GET, POST, PUT, etc.). 
   - **CORS** is Cross-Origin Resource Sharing - allowing for HTTP requests to be made from one website to another in the browser. This is required for Socket.IO. This can be implemented securely by using a whitelist using the `Access-Control-Allow-Origin` request header.
   - **Express** is a convenient NodeJS framework for doing back-end (in contrast to using React for front-end. Although we're using React routing for this one). We want Express to make use of middleware.
   - **Dotenv** is for loading environment variables (e.g. Secrets!)
@@ -35,9 +35,15 @@
 - Handling a lot of this will be:
   - States for storing the submitted values
   - A socket instance to handle communication between clients and the server.
-### Importing Syntax
-- Default exports are imported without braces.
-- Named exports are imported with braces.
+### Importing/Exporting Syntax (ES6 - on this app's client-side)
+- Default exports are imported without braces. - `import <MODULE_NAME> from '<FILE_PATH/PACKAGE NAME>';`
+- Named exports are imported with braces. - `import { <MODULE_NAME> } from '<FILE_PATH/PACKAGE NAME>';`
+- Exporting one module is done via `export default <MODULE_NAME>;`.
+
+### Importing/Exporting Syntax (CommonJS - on this app's server-side)
+- Use the require keyword - `require('<FILE_PATH/PACKAGE NAME>');`.
+- Exporting one module is done via `module.exports = <MODULE_NAME>;`
+
 ### Props
 - Props are how you pass states between components.
 - Since components work like functions, props are implemented like parameters to a function.
@@ -171,6 +177,7 @@ root.render(<Timer />);
   - Behaviour is then driven from the client side.
 - New problem: finding issue with `socket.on('receive_message', ())` not firing.
   - **Result**: The event was firing, there was just a missing event not included the code that welcomes the new user. Good to explore the socket documentation a bit more though.
+- Also creating the `save message` function to write to the database. 
 
 # Javascript Quirky Operators
 ## Destructuring
