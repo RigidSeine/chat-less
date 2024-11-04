@@ -223,9 +223,15 @@ root.render(<Timer />);
 # MongoDB
 - Connecting to it:
 ```js
-
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://rigidseine:<password>@chat-less-1.mvqvxkp.mongodb.net/?retryWrites=true&w=majority&appName=chat-less-1";
+
+//Always URI encode the username and password using the encodeURIComponent method to ensure they are correctly parsed.
+const username = encodeURIComponent('<username-retrieved-from-secret>');
+const password = encodeURIComponent('<password-retrieved-from-secret>');
+const clusterUrl =  '<cluster-name-retrieved-from-secret>';
+const authMechanism = "DEFAULT";
+
+const uri = `mongodb+srv://${username}:${password}@${clusterUrl}/?authMechanism=${authMechanism}`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -251,3 +257,10 @@ async function run() {
 run().catch(console.dir);
 
 ```
+
+## MongoDB Terminology
+- **Cluster:** A group of databases = SQL Database
+- **Database:** A group of collections = SQL Schema
+- **Collection:** A group of objects = SQL Table
+- **Document:** A record/object = SQL Row
+- **Field:** Property of an object = SQL column
