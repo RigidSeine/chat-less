@@ -5,6 +5,9 @@ const app = express();
 http = require('http');
 const cors = require('cors');
 const {Server} = require('socket.io');
+const mongodbSaveMessage = require ('./services/mongodb-save-message.jsx');
+
+require('dotenv').config();
 
 app.use(cors()); //Adds cors middleware
 
@@ -25,6 +28,7 @@ let allUsers = [];
 io.on('connection', (socket) => {
     console.log(`User connected with ID: ${socket.id}`);
 
+    //Join room event listener
     socket.on('join_room', (data) => {
         const {username, room}  = data; //Expecting username and room to be returned by the client
         socket.join(room); //Join the user to a socket room
@@ -52,6 +56,17 @@ io.on('connection', (socket) => {
         var chatRoomUsers = allUsers.filter((user) => user.room == room);
         socket.to(room).emit('chatroom_users', chatRoomUsers); //Emit the list of chatroom users so that the list of users can be displayed in the room on the frontend
         socket.emit('chatroom_users', chatRoomUsers);
+    });
+
+    //Send message event listener
+    socket.on('send_message', (data) => {
+        const {message, room, username, createdTime } = data;
+
+        io.in(room).emit('receive_message', data); //Send the message to all users in the room
+        
+        mongodbSaveMessage(message, username, room, createdTime) //Write the message to the database
+        .then((response) => console.log(response))
+        .catch((err) => console.error('Error trying to fire mongodbSaveMessage: ', err));
     });
 });
 
