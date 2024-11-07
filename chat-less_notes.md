@@ -177,7 +177,37 @@ root.render(<Timer />);
   - Behaviour is then driven from the client side.
 - New problem: finding issue with `socket.on('receive_message', ())` not firing.
   - **Result**: The event was firing, there was just a missing event not included the code that welcomes the new user. Good to explore the socket documentation a bit more though.
-- Also creating the `save message` function to write to the database. 
+- Also creating the `save message` function to write to the database.
+- Of course, we've learnt from the Hack the Box CTFs at this point to sanitise any user input going to the database.
+- Following on the nice bit of async with `save message`, `get messages` follows.'
+- In creating rendering the chat history, we get to use the `useRef()` hook. It's very similar to the `useState()` hook, but the **changing the ref doesn't trigger a re-render**.
+  - In this specific case, we use the hook to manipulate a DOM object by completing the following steps 
+  1. Initialising the reference with a `null` value:
+  ```jsx
+  import {useRef} from 'react';
+
+  function Messages {
+    const messagesColumnRef = useRef(null);
+
+    //...//
+  }
+  ```
+  2. In the returned HTML, pass the ref object as a ref object of the DOM node we're manipulating
+  ```jsx
+    return( 
+      <div className={styles.messagesColumn} ref={messagesColumnRef}>
+      //..//
+    );
+  ```
+  3. Now we can use whatever HTMLElement behaviour with it:
+  ```jsx
+    //Whenever the state of messagesReceived updates, use the reference to the DOM object to scroll
+    //to the most recent message
+    useEffect(() => {
+      messagesColumnRef.current.scrollTop = messagesColumnRef.current.scrollHeight;
+    }, [messagesReceived]
+    );
+  ```
 
 # Javascript Quirky Operators
 ## Destructuring
@@ -264,3 +294,23 @@ run().catch(console.dir);
 - **Collection:** A group of objects = SQL Table
 - **Document:** A record/object = SQL Row
 - **Field:** Property of an object = SQL column
+- **Projection:** Tool used query specific fields instead of all of them from a collection. = SQL `SELECT <columnA>, <columnB>, <columnC> <,...etc> FROM <table>`  
+
+## MongoDB Commands
+- **Insert** = SQL INSERT INTO 
+```node.js
+
+```
+- **Find()** = SQL SELECT * FROM 
+```js
+const cursor = db.collection('inventory').find({}); //SELECT * FROM inventory
+
+const cursor = db.collection('inventory').find({ status: 'D' }); //SELECT * FROM inventory WHERE status = 'D'
+
+const cursor = db.collection('inventory').find({
+  status: 'A',
+  $or: [{ qty: { $lt: 30 } }, { item: { $regex: '^p' } }]
+});
+//SELECT * FROM inventory WHERE status = "A" AND ( qty < 30 OR item LIKE "p%")
+//$and is a valid operator too. This query simply omits it since the additional properties in the object use AND by default.
+```

@@ -6,6 +6,7 @@ http = require('http');
 const cors = require('cors');
 const {Server} = require('socket.io');
 const mongodbSaveMessage = require ('./services/mongodb-save-message.jsx');
+const mongodbGetMessages = require ('./services/mongodb-get-messages.jsx');
 
 require('dotenv').config();
 
@@ -32,6 +33,13 @@ io.on('connection', (socket) => {
     socket.on('join_room', (data) => {
         const {username, room}  = data; //Expecting username and room to be returned by the client
         socket.join(room); //Join the user to a socket room
+        
+        //Get the last 100 messages sent in the chat room
+        mongodbGetMessages(room)
+        .then((last100Messages) => {
+            socket.emit('last_100_messages', last100Messages);
+         })
+        .catch((err) => { console.err(err)});
         
         let createdTime = Date.now();
 
