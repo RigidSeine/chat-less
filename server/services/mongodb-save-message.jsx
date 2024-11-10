@@ -1,6 +1,6 @@
 // server/services/mongodb-save-message.jsx
 
-const sanitiser = require('./sanitise-string.jsx');
+const sanitiser = require('../utils/sanitise-string.jsx');
 const msgClient = require('./mongodb-create-ypl-client.jsx');
 
 async function mongodbSaveMessage(message, username, room, createdTime){

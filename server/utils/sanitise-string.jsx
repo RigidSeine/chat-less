@@ -1,4 +1,4 @@
-//./server/services/sanitise-string.jsx
+//./server/utils/sanitise-string.jsx
 
 function sanitiseString(str) {
     if (!str) return;
