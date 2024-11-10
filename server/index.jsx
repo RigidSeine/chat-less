@@ -34,12 +34,12 @@ io.on('connection', (socket) => {
         const {username, room}  = data; //Expecting username and room to be returned by the client
         socket.join(room); //Join the user to a socket room
         
-        //Get the last 100 messages sent in the chat room
+        //Get the last 100 messages sent in the chat room as a findCursor
         mongodbGetMessages(room)
         .then((last100Messages) => {
             socket.emit('last_100_messages', last100Messages);
          })
-        .catch((err) => { console.err(err)});
+        .catch((err) => { console.error(err)});
         
         let createdTime = Date.now();
 

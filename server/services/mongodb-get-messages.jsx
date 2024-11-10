@@ -22,14 +22,14 @@ async function mongodbGetMessages(room){
         const db = client.db('YAP_LESS');
         const collection = db.collection('YPL_MESSAGE');
 
-        const findResultsCursor = collection.find(query)
+        const findResultsCursor = await collection.find(query)
         .sort(sortOrder)
         .project(projection)
         .limit(recordLimit);
 
-        for await (const doc of findResultsCursor){
-            console.log(doc);
-        }
+        //Return the results as an array to append it to the messagesReceived state array later
+        //toArray needs to be awaited as well otherwise it'll run synchronously before the query is complete
+        return await findResultsCursor.toArray();
 
     } catch (err) {
         console.error('Error encountered trying to retrieve messages: ', err);
