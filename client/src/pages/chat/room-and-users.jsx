@@ -23,10 +23,8 @@ const RoomAndUsers = ({socket, room, username}) => {
     }, [socket]);
 
     const leaveRoom = () => {
-        const createdTime = Date.now();
-
         //Say goodbye to the room
-        socket.emit('leave_room', {username, room, createdTime});
+        socket.emit('leave_room', {username, room});
         //Go back to the home page
         navigate('/', {replace: true});
     };

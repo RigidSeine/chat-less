@@ -7,6 +7,8 @@ const cors = require('cors');
 const {Server} = require('socket.io');
 const mongodbSaveMessage = require ('./services/mongodb-save-message.jsx');
 const mongodbGetMessages = require ('./services/mongodb-get-messages.jsx');
+const removeUser = require('./utils/remove-user.jsx');
+const getRoomUsers = require('./utils/get-room-users.jsx');
 
 require('dotenv').config();
 
@@ -61,7 +63,7 @@ io.on('connection', (socket) => {
         chatRoom = room;
         allUsers.push({id: socket.id, username, room});
         
-        var chatRoomUsers = allUsers.filter((user) => user.room == room);
+        var chatRoomUsers = getRoomUsers(room, allUsers);
         socket.to(room).emit('chatroom_users', chatRoomUsers); //Emit the list of chatroom users so that the list of users can be displayed in the room on the frontend
         socket.emit('chatroom_users', chatRoomUsers);
     });
@@ -76,6 +78,32 @@ io.on('connection', (socket) => {
         .then((response) => console.log(response))
         .catch((err) => console.error('Error trying to fire mongodbSaveMessage: ', err));
     });
+
+    //Event listener for when someone leaves a room
+    socket.on('leave_room', (data) => {
+        const {username, room} = data;
+
+        //Remove them from the socket room
+        socket.leave(room);
+
+        const createdTime = Date.now();
+
+        //Remove the user from all the user lists
+        allUsers = removeUser(socket.id, allUsers);
+
+        //Get the new list of users for that room
+        const roomUsers = getRoomUsers(room, allUsers);
+
+        //Update the room list in the room
+        socket.to(room).emit('chatroom_users', roomUsers) //This might need filtering
+
+        //Let the room know that the user has left
+        socket.to(room).emit('receive_message', {
+            username: chatbot,
+            message: username + ' has left the chat.',
+            createdTime
+        })
+    })
 });
 
 //Set up the port that server is running on

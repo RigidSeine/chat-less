@@ -208,6 +208,7 @@ root.render(<Timer />);
     }, [messagesReceived]
     );
   ```
+- The last on list is component A, the sidebar: this was more of the same. In `./server/index.jsx`, a `chatroom_users` was set up as a way of updating the user list when they joined room. This was leveraged for updating the displayed list of users.
 
 # Javascript Quirky Operators
 ## Destructuring
@@ -217,6 +218,9 @@ root.render(<Timer />);
 ## Spread
 - `...myArray` - copies and returns the elements of the array for use. 
 - **Warning**: Usage of spread on large arrays can lead to stack overflows and not the good kind.
+
+## Parentheses Instead Of Curly Braces (For Callback Functions)
+- Usually you open callback functions with curly braces `{}`, but if you use parentheses `()`, it's a short form for returning what's enclosed.
 
 # What the Hell is a Socket?
 - According to the (Socket.IO website)[https://socket.io/docs/v4/how-it-works/], it's a bidirectional channel between a Socket.IO server (Node.js) and Socket.IO client (browser, Node.js) established with a **Websocket connection** whenever possible, and will use HTTP long-polling as fallback. So it's a **websocket** that resorts to HTTP long-polling as a last resort for transporting data.
