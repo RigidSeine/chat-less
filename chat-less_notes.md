@@ -222,6 +222,10 @@ root.render(<Timer />);
 ## Parentheses Instead Of Curly Braces (For Callback Functions)
 - Usually you open callback functions with curly braces `{}`, but if you use parentheses `()`, it's a short form for returning what's enclosed.
 
+## Optional Chaining
+- Similar to in C# where you declare a nullable variable with `[TYPE]?`, javascript has optional chaining for when you're chaining (accessing an object property or calling a function): `?.`.
+- If the object accessed or the function called is `undefined` or `null`, the expressions evaluates to `undefined` and prevents throwing an error `Error: Cannot read properties of undefined (reading '[NON-EXISTENT PROPERTY]')`
+
 # What the Hell is a Socket?
 - According to the (Socket.IO website)[https://socket.io/docs/v4/how-it-works/], it's a bidirectional channel between a Socket.IO server (Node.js) and Socket.IO client (browser, Node.js) established with a **Websocket connection** whenever possible, and will use HTTP long-polling as fallback. So it's a **websocket** that resorts to HTTP long-polling as a last resort for transporting data.
 ## So What's a Websocket? 

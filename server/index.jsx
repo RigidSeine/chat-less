@@ -95,7 +95,7 @@ io.on('connection', (socket) => {
         const roomUsers = getRoomUsers(room, allUsers);
 
         //Update the room list in the room
-        socket.to(room).emit('chatroom_users', roomUsers) //This might need filtering
+        socket.to(room).emit('chatroom_users', roomUsers) 
 
         //Let the room know that the user has left
         socket.to(room).emit('receive_message', {
@@ -104,6 +104,27 @@ io.on('connection', (socket) => {
             createdTime
         })
     })
+
+    //Event listener for when a user is forcefully disconnected (e.g. their internet drops)
+    socket.on('disconnect', () => {
+        const user = allUsers.find((user) => user.id == socket.id);
+
+        if (user?.username) {
+            //Remove the user
+            allUsers = removeUser(user.id, allUsers);
+
+            //Get the new list of users in the room
+            const roomUsers = getRoomUsers(user.room, allUsers);
+
+            //Update the room's userlist
+            socket.to(user.room).emit('chatroom_users', roomUsers);
+
+            //Notify the room of the disconnection
+            socket.to(user.room).emit('receive_message', {
+                message: user.username + ' has disconnected from the chat.'
+            });
+        }
+    });
 });
 
 //Set up the port that server is running on
