@@ -58,7 +58,7 @@ npm install
 ```
   - Create a `.env` file for environment variables. This is where your MongoDB credentials go so that you can read and write your database.\
   NEVER SHARE THIS FILE ANYWHERE.\
-  How to create file? Open a text file in a text editor (not Microsoft Word, try VS Code or a lightweight text editor that doesn't have an LLM baked into it like Windows notepad... wait a minute.)\
+  How to create the file? Open a text file in a text editor (not Microsoft Word, try VS Code or a lightweight text editor that doesn't have an LLM baked into it like Windows notepad... wait a minute.)\
   \
   Here's what you put into the file:
 ```
