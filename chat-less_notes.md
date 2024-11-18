@@ -328,3 +328,9 @@ const cursor = db.collection('inventory').find({
 # Deployment
 ## Nginx Web Server Setup
 - Since this leveraging an existing web server, we're going to be modifying the nginx config file to set up a virtual server for Chat Less.
+- Well first I looked at the config file and it was a pig sty. So I tidied it up a little to have tenkiame.org as the actual server name instead of just `_`.
+- Then I figured out that I need to add additional server directives for the ports that nginx will be listening on for the Chat Less app.
+- But before that, a new directory adjacent to Tenkiame's directory (`var/www/app`) needs to be created to host all the app files.
+  - Any permission issues are fixed with good ol' `sudo chmod 777 chat-less`.
+- Then node.js needs to be installed.
+- Annnnd all the node.js dependencies within both the `client` folder and the `server` folder.
