@@ -164,7 +164,9 @@ root.render(<Timer />);
   - A: A sidebar on the left displaying the name of the room, the list of users and an action(s) for the room (i.e. leave)
   - B: The chat history istself.
   - C: The message bar and the button to send a message.
-   ![Things to in the chatroom: 1. Leave.](thingstodoleave.png)\
+  
+   ![Things to in the chatroom: 1. Leave.](/Notes_images/thingstodoleave.png)\
+
 - Built the messages part and tried to test joining a room only to get a blank page on app startup.
   - Check the console for errors, kids. I found a couple of errors of includes not being written and so a couple of pages couldn't be found.
   - And if that still doesn't work then check you CSS modules. Accidentally had one spelt as *.module**s**.css instead of *.module.css which ruined everything.
@@ -322,3 +324,7 @@ const cursor = db.collection('inventory').find({
 //SELECT * FROM inventory WHERE status = "A" AND ( qty < 30 OR item LIKE "p%")
 //$and is a valid operator too. This query simply omits it since the additional properties in the object use AND by default.
 ```
+
+# Deployment
+## Nginx Web Server Setup
+- Since this leveraging an existing web server, we're going to be modifying the nginx config file to set up a virtual server for Chat Less.
