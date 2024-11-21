@@ -326,11 +326,22 @@ const cursor = db.collection('inventory').find({
 ```
 
 # Deployment
-## Nginx Web Server Setup
+## Nginx Web Server Reverse Proxy Setup And Moving Files
 - Since this leveraging an existing web server, we're going to be modifying the nginx config file to set up a virtual server for Chat Less.
 - Well first I looked at the config file and it was a pig sty. So I tidied it up a little to have tenkiame.org as the actual server name instead of just `_`.
 - Then I figured out that I need to add additional server directives for the ports that nginx will be listening on for the Chat Less app.
 - But before that, a new directory adjacent to Tenkiame's directory (`var/www/app`) needs to be created to host all the app files.
   - Any permission issues are fixed with good ol' `sudo chmod 777 chat-less`.
-- Then node.js needs to be installed.
+- Then node.js needs to be installed (see https://nodejs.org/en/download/package-manager).
 - Annnnd all the node.js dependencies within both the `client` folder and the `server` folder.
+  - I accidentally moved all the node_modules into the VM as well but there's likely compatibility issues between Windows binaries and the Linux environment.
+  - So I ran `rm -rf node_modules` and just removed them all before running `npm install` which works off the `package_lock.json` file.
+- That's the files done (?), so next I created an A record for `chat.tenkiame.org` pointing to the VM's IP address.
+- Then I created a new virtual server in the nginx config file mirroring Tenkiame's port 80 setup (Certbot commands need to be run later for the new subdomain).
+
+## Running the app
+- So far, everything's been running in dev but it turns out it doesn't quite work the same for production.
+- Fortunately, on the client-side there is a script already defined in the `package.json` file for production called `build`. It follows this can (and was) run by using the command: `npm run build`.
+- However, there is no such thing defined for the Express back-end. So hunting around has led to two things: 
+  - [Installing PM2 to daemonize the app](https://deploybot.com/blog/guest-post-how-to-set-up-and-deploy-nodejs-express-application-for-production)
+  - And [setting the `NODE_ENV` variable to `production`.](https://stackoverflow.com/questions/9198310/how-to-set-node-env-to-production-development-in-os-x)

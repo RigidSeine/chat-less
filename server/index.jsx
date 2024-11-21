@@ -128,6 +128,6 @@ io.on('connection', (socket) => {
 });
 
 //Set up the port that server is running on
-server.listen(4000, () => 'Server is listening on port 5173!');
+server.listen(4000, () => 'Server is listening on port 4000!');
 
 console.log('server running');
