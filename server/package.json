@@ -11,6 +11,7 @@
     "nodemon": "^3.1.4"
   },
   "scripts": {
-    "dev": "nodemon index.jsx"
+    "dev": "nodemon index.jsx",
+    "build": "NODE_ENV=production pm2 start index.jsx --name chat-less-backend"
   }
 }

@@ -333,11 +333,19 @@ const cursor = db.collection('inventory').find({
 - But before that, a new directory adjacent to Tenkiame's directory (`var/www/app`) needs to be created to host all the app files.
   - Any permission issues are fixed with good ol' `sudo chmod 777 chat-less`.
 - Then node.js needs to be installed (see https://nodejs.org/en/download/package-manager).
+  - One problem: using the `nvm` method caused `node` and `npm` to install in the wrong place and prevent the usage of `npm install [package_name]` later on.
+  - This can be fixed by creating `symbolic links` for `node` and `npm` since they're expected to be in the `/usr/local/bin` directory.
+  ```bash
+    sudo ln -s $(which npm) /usr/local/bin/npm
+    sudo ln -s $(which node) /usr/local/bin/node
+  ```
+  - This can then be verified by using `whereis npm` and `whereis node` which should output `/usr/local/bin/npm` and `/usr/local/bin/node`, respectively.
 - Annnnd all the node.js dependencies within both the `client` folder and the `server` folder.
   - I accidentally moved all the node_modules into the VM as well but there's likely compatibility issues between Windows binaries and the Linux environment.
   - So I ran `rm -rf node_modules` and just removed them all before running `npm install` which works off the `package_lock.json` file.
 - That's the files done (?), so next I created an A record for `chat.tenkiame.org` pointing to the VM's IP address.
-- Then I created a new virtual server in the nginx config file mirroring Tenkiame's port 80 setup (Certbot commands need to be run later for the new subdomain).
+- Then I created a new virtual server in the nginx config file mirroring Tenkiame's port 80 setup.
+- At this point, it's fine to run a certbot command to get a new certificate for the subdomain `sudo certbot --nginx -d chat.tenkiame.org`.
 
 ## Running the app
 - So far, everything's been running in dev but it turns out it doesn't quite work the same for production.
@@ -345,3 +353,12 @@ const cursor = db.collection('inventory').find({
 - However, there is no such thing defined for the Express back-end. So hunting around has led to two things: 
   - [Installing PM2 to daemonize the app](https://deploybot.com/blog/guest-post-how-to-set-up-and-deploy-nodejs-express-application-for-production)
   - And [setting the `NODE_ENV` variable to `production`.](https://stackoverflow.com/questions/9198310/how-to-set-node-env-to-production-development-in-os-x)
+  - Putting it all together we get a script called `build` - `"build": "NODE_ENV=production pm2 start index.jsx --name chat-less-backend"`
+  - This sets the `NODE_ENV` environment variable to `production` with a lifetime of only a session, but it's run everytime it starts up so it should be fine.
+  - This also takes the place of a `systemd` service that I used to run TenkiAme
+
+## Troubleshooting
+- At this point, navigating to `chat.tenkiame.org` just sends me to the Tenkiame app. 
+  - The only detail left out at this point is just that the A record (chat.tenkiame.org) points to the IP address but not to a specific port number.
+  - And that's because DNS can't point to a specific port number in the first place.
+  - Back to the drawing board of serving up multiple apps in nginx?
