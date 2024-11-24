@@ -356,9 +356,22 @@ const cursor = db.collection('inventory').find({
   - Putting it all together we get a script called `build` - `"build": "NODE_ENV=production pm2 start index.jsx --name chat-less-backend"`
   - This sets the `NODE_ENV` environment variable to `production` with a lifetime of only a session, but it's run everytime it starts up so it should be fine.
   - This also takes the place of a `systemd` service that I used to run TenkiAme
+- Since we're using PM2, a PM2 account at `pm2.io` has been created for monitoring purposes. 
 
 ## Troubleshooting
 - At this point, navigating to `chat.tenkiame.org` just sends me to the Tenkiame app. 
   - The only detail left out at this point is just that the A record (chat.tenkiame.org) points to the IP address but not to a specific port number.
   - And that's because DNS can't point to a specific port number in the first place.
   - Back to the drawing board of serving up multiple apps in nginx?
+    - Change server/indexjs file to include the `get` command? ==> This confirms that the nginx config is correctly serving up two different apps since I can see the Hello World both at [IP_ADDRESS:4000] and `chat.tenkiame.org` with 4000 being the port that the server is listening on. Now the issue is to "pass the correct files into app being served"
+    - Update proxy pass to 5173?
+      - Good try. But I'm unable to run the app from the `dist` files alone locally since all I ran was `npm run build` (which only builds the distribution files.)
+      - No proxy pass - only have nginx listen to the front-end port then try files at the `dist` directory. 🐒🐒🐒
+      - New problem: Server is not allowing XMLHttpRequest due to the CORS policy listing `http://localhost:5173` instead of `https://chat.tenkiame.org`.
+      - Easily fixed by adding the site into the allow list.
+- New problem: Encountering an "o is not iterable" problem since the files are encoded.
+```js
+  C.useEffect( () => (e.on("last_100_messages", o => {
+        n(l => [...o, ...l])
+    }
+```
