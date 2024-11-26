@@ -92,7 +92,7 @@ cd chat-less
   cd server
   ```
 
-  - Install dependencies (very important!!):
+  - Install dependencies ***(very important!!)***:
 
 ```bash
 npm install
@@ -109,7 +109,7 @@ MDB_CLUSTER_NAME=<your_cluster>
 ```
 
 ### 4. **Setup the Client**
-  - Open a **new terminal (important!)** and navigate to the `client` folder:
+  - Open a ***new terminal (important!)*** and navigate to the `client` folder:
   ```bash
   cd ../client
   ```
