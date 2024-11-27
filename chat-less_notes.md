@@ -375,3 +375,30 @@ const cursor = db.collection('inventory').find({
         n(l => [...o, ...l])
     }
 ```
+- Another new problem: "ERR_CONNECTION_REFUSED" for the initial socket connection on port 4000.
+  - Trying to add port inbound rules to see if it works ==> Nope.
+  - Maybe needs an additional reverse proxy for socket.io
+    - Yep. This is half of the solution. Traffic, of course, needs to go reach our websocket tech that we're using. 
+    - Servers are typically reachable at a separate domain or at a specific end-point on the domain and this is the axiom that we work off of in trying to make sense of Socket.IO.
+- As described in the [Socket.IO documentation for Reverse Proxying](https://socket.io/docs/v4/reverse-proxy/), there are examples of how to set up the `Nginx` config file. For this specific setup, we're only interested in forwarding the Socket.IO request and letting the `try_files` statement do all the heavy lifting for the client content.
+```
+  server {
+    listen 80;
+    root /var/www/html;
+
+    location /socket.io/ {
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Host $host;
+
+      proxy_pass http://localhost:3000; # Replace this with port number with the one that the server is listening to. For Chat Less, it's 4000. 
+
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+    }
+  }
+```
+- The second half of the solution is the connection statement from the client side: `const socket = io.connect('http://localhost:4000');`
+- This worked fine in development since both the client and the server were both on the same machine. But of course, the client is well, any machine other than the server machine so localhost is a no-go. It's so obvious and yet I did not realise it until my colleagues pointed it out.
+- So what goes there instead? Reading the [Socket.IO documentation for troubleshooting](https://socket.io/docs/v4/troubleshooting-connection-issues/) - for the server-side behaviour to work, the Socket.IO server must be reachable. This can be tested with `curl "<the server URL>/socket.io/?EIO=4&transport=polling"` which returns something like `0{"sid":"Lbo5JLzTotvW3g2LAAAA","upgrades":["websocket"],"pingInterval":25000,"pingTimeout":20000}`
+- Taking this into account, we can make an educated guess for our connect statement and use `const socket = io.connect('https://chat.tenkiame.org');` - and it works!

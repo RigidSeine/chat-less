@@ -7,7 +7,7 @@ import io from 'socket.io-client'
 import Home from './pages/home'
 import Chat from './pages/chat'
 
-const socket = io.connect('http://localhost:4000/');
+const socket = io.connect('https://chat.tenkiame.org');
 
 const App = () => {
   const[username, setUsername] = useState('');
