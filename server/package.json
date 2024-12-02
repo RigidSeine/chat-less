@@ -5,7 +5,9 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "mongodb": "6.10",
-    "socket.io": "^4.7.5"
+    "socket.io": "^4.7.5",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"
