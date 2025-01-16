@@ -21,7 +21,6 @@ async function mongodbSaveMessage(message, username, room, createdTime){
             createdTime: createdTime
         });
 
-        console.log('Inserted 1 document woth _id:' + result.insertedId);
     } catch (err){
         console.error('Error inserting document during save-message: ', err);
     } finally {
