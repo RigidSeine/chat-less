@@ -1,9 +1,12 @@
 //./server/services/mongodb-get-messages.jsx
 
 const msgClient = require('./mongodb-create-ypl-client.jsx');
+const logger = require('../utils/winston-logger.jsx');
 
 async function mongodbGetMessages(room){
     const client = msgClient();
+
+    logger.info('Get Messages Client: ' + client);
 
     //Creating constants to paramterise the query
     const query = {room: room};
@@ -16,6 +19,8 @@ async function mongodbGetMessages(room){
     const sortOrder = {createdDate: -1};
     const recordLimit = 100;
 
+    logger.info('100 messages query created.');
+
     try{
         await client.connect();
 
@@ -27,9 +32,13 @@ async function mongodbGetMessages(room){
         .project(projection)
         .limit(recordLimit);
 
+        const resultsArray = await findResultsCursor.toArray();
+
+        await logger.info(resultsArray[0]);
+
         //Return the results as an array to append it to the messagesReceived state array later
         //toArray needs to be awaited as well otherwise it'll run synchronously before the query is complete
-        return await findResultsCursor.toArray();
+        return resultsArray;
 
     } catch (err) {
         console.error('Error encountered trying to retrieve messages: ', err);

@@ -9,6 +9,7 @@ const mongodbSaveMessage = require ('./services/mongodb-save-message.jsx');
 const mongodbGetMessages = require ('./services/mongodb-get-messages.jsx');
 const removeUser = require('./utils/remove-user.jsx');
 const getRoomUsers = require('./utils/get-room-users.jsx');
+const logger = require('./utils/winston-logger.jsx');
 
 require('dotenv').config();
 
@@ -29,19 +30,20 @@ let allUsers = [];
 
 //Listen for when a client connects via socket.io-client.
 io.on('connection', (socket) => {
-    console.log(`User connected with ID: ${socket.id}`);
+    //console.log(`User connected with ID: ${socket.id}`);
+    logger.info(`User connected with ID: ${socket.id}`);
 
     //Join room event listener
     socket.on('join_room', (data) => {
         const {username, room}  = data; //Expecting username and room to be returned by the client
         socket.join(room); //Join the user to a socket room
-        
+
         //Get the last 100 messages sent in the chat room as a findCursor
         mongodbGetMessages(room)
         .then((last100Messages) => {
             socket.emit('last_100_messages', last100Messages);
          })
-        .catch((err) => { console.error(err)});
+        .catch((err) => { logger.error('Error encountered trying to retrieve messages: ', err);});
         
         let createdTime = Date.now();
 
@@ -75,8 +77,8 @@ io.on('connection', (socket) => {
         io.in(room).emit('receive_message', data); //Send the message to all users in the room
         
         mongodbSaveMessage(message, username, room, createdTime) //Write the message to the database
-        .then((response) => console.log(response))
-        .catch((err) => console.error('Error trying to fire mongodbSaveMessage: ', err));
+        .then((response) => logger.info(response))
+        .catch((err) => logger.error('Error trying to fire mongodbSaveMessage: ', err));
     });
 
     //Event listener for when someone leaves a room
@@ -130,4 +132,5 @@ io.on('connection', (socket) => {
 //Set up the port that server is running on
 server.listen(4000, () => 'Server is listening on port 4000!');
 
-console.log('server running');
+console.log('Server running');
+logger.info('Server running');

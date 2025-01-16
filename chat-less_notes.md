@@ -402,3 +402,13 @@ const cursor = db.collection('inventory').find({
 - This worked fine in development since both the client and the server were both on the same machine. But of course, the client is well, any machine other than the server machine so localhost is a no-go. It's so obvious and yet I did not realise it until my colleagues pointed it out.
 - So what goes there instead? Reading the [Socket.IO documentation for troubleshooting](https://socket.io/docs/v4/troubleshooting-connection-issues/) - for the server-side behaviour to work, the Socket.IO server must be reachable. This can be tested with `curl "<the server URL>/socket.io/?EIO=4&transport=polling"` which returns something like `0{"sid":"Lbo5JLzTotvW3g2LAAAA","upgrades":["websocket"],"pingInterval":25000,"pingTimeout":20000}`
 - Taking this into account, we can make an educated guess for our connect statement and use `const socket = io.connect('https://chat.tenkiame.org');` - and it works!
+- Or does it? I think this socket connection is failing because the other problem (`"o is not iterable" `) seems to be happening because the messages aren't being retrieved. But the it works in dev when I change the connection destination back to localhost:4000.
+  - However, we can observe that the event is firing (since the console seems to be logging a null value) and therefore there the socket connection is working as intended. So is it a matter of the connection to the database?
+- This should've been done a while ago, but we're employing Winston now to log things on the server-side.
+- There are a couple of reasons this could be failing:
+  1. Invalid authentication e.g. Incorrect credentials, no credentials, etc. 
+  2. Connection permissions to the database.
+- The logger is great for number 1, though it's a little strenous having to pore through and see where and what the logger is writing.
+- Number 2 can be very quick to investigate. In fact, in this case it was the exact issue. The network settings needed to be adjusted to allow all IPs. All it needed was a couple of clicks after logging in to the dashboard.
+- [16/01/2025] - Socket.io 502 Error (Bad Gateway) encountered on using the app. 
+  - Checked pm2 to see that the app wasn't running therefore logged into VM, moved to `chat-less\server` directory and reran `pm2 start index.jsx --name chat-less-backend` to get it started. App was working immediately without a need for refresh.
