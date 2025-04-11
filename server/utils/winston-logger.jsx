@@ -7,7 +7,8 @@ const fileRotateTransport = new winston.transports.DailyRotateFile({
     filename: 'chat-less-combined-%DATE%.log',
     datePattern: 'DD-MM-YYYY',
     maxFiles: '14d',
-    maxSize: '500k'
+    maxSize: '500k',
+    dirname: 'logs'
 });
 
 const logger = winston.createLogger({
