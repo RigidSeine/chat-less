@@ -358,6 +358,102 @@ const cursor = db.collection('inventory').find({
   - This also takes the place of a `systemd` service that I used to run TenkiAme
 - Since we're using PM2, a PM2 account at `pm2.io` has been created for monitoring purposes. 
 
+## Docker Deployment
+- Installed Docker Desktop for convenient GUI to spin up docker containers
+- Why containerise our app?
+  - For easy portability and scalability.
+  - Primarily for creating a CI/CD pipeline - automating the process from code commit to app deployment.
+- See /docker_notes.md for more details on docker
+- Create two dockerfiles to containerise frontend and backend on the VM.
+- Use docker compose to build the containers from the dockerfiles. (https://www.youtube.com/watch?v=Qw9zlE3t8Ko) at file level one above the frontend and backend files (on the VM).
+- Configure nginx as a reverse-proxy port forward to docker container.
+- Use Github actions to retrieve new files for app updates from Github repo.
+
+### The Backend
+- The individual dockerfiles are actually quite simple to write since they're so short. Short enough in fact, that they can be included in these notes.
+  
+```dockerfile
+#Create the image based on the official Node image from dockerhub
+#Using alpine for a lightweight version of Node
+#Using this version as its closest to the version used in development
+FROM node:20.19-alpine
+
+#Create the app directory and use this as the working directory for subsequent commands
+WORKDIR /app 
+
+#Copy the dependency definitions
+COPY package*.json ./
+
+# Install dependencies using the Node command
+RUN npm install
+
+# Copy over all the code needed
+COPY . .
+
+# Expose the port the app the runs in
+EXPOSE 4000
+
+# Serve the app by listing out the run command as elements in a list 
+CMD ["npm", "run", "dev"]
+```
+- The comments for the most part explain how this works
+- **CAVEAT** - The above script used `npm run dev` as the command for starting up the app, and while the non-Docker production command is `npm run build` which is defined as `"NODE_ENV=production pm2 start index.jsx --name chat-less-backend"` we're skipping all that and using `node index.jsx`. 
+  - This is because we're moving away from pm2 and the environment variable will be defined in the Docker compose file.
+- One thing to note is that `EXPOSE 4000` means that port 4000 is being exposed on the container itself. 4000 is used since the app's backend listens on this.
+- This port can then mapped to a port on the host machine and accessed through there.
+  - E.g. Let's say I run a container on my local PC. If port 4000 is exposed on the container, then port 12345 of the local PC can be mapped to that container port (`12345:4000`), and I can access the container's port 4000 by going to `http://localhost:12345`.
+- Once created, the dockerfile can then be used to build an image with the command `docker build -t chat-less-server:v02042025 .` 
+  - The `v02042025` is just the letter `v` for version followed by the current date.
+- Since we use Docker Desktop, we can spin up a container using our newly built image while also mapping any local port to the container's exposed port.
+- ![Screenshot of newly created docker image](../chat-less/Notes_images/docker-image-example-1.png)
+- We can now test this if the container is serving up the backend of the app by testing the backend as if it was being served up on the remote VM.
+  - Go to `http://localhost:[mappedPort]/` to get 'Cannot Get /' message since there's nothing to get, but it's not an empty response.
+  - Then to go Command Prompt and run `curl "http://localhost:[mappedPort]/socket.io/?EIO=4&transport=polling"` to hopefully receive something like `0{"sid":"lUI2ARZiBAor5OScAAAA","upgrades":["websocket"],"pingInterval":25000,"pingTimeout":20000,"maxPayload":1000000}` as the response (as per [Socket.io's troubleshooting page](https://socket.io/docs/v4/troubleshooting-connection-issues/).)
+
+### The Frontend
+- One mistake I made was misremembering that there was a script which ran an ongoing process for the frontend. 
+  - This is the case for running the app in Dev, but not in PROD.
+- The PROD script actually just creates the build files which can *then* be served up in an ongoing process (aka. a service) by a web server - which in our case is an Nginx process.
+- What this means for running a Docker container is that when using a dockerfile that tries to copy app files and build them, the Docker container successfully does so and then immediately shuts down since there is no ongoing service. 
+- After much investigating, the common approach for creating the frontend starts by using the same logic as backend's dockerfile by using a (nodejs) base image and copying over the app files.
+  - However, it then pivots by using an additional build stage by installing an Nginx base image, moving the build files into the appropriate Nginx folder (`/usr/share/nginx/html`) and letting the container serve that up as the content. 
+    - See [Nginx docs](https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-docker/) for more details.
+    - See [this video](https://www.youtube.com/watch?v=K7PsxBMeBCI) for an example.
+    - See [this article](https://www.innokrea.com/dockerizing-the-frontend-do-it-right-with-react-js-vite/) for an example with the Nginx image in the docker file
+- So now, the proposed setup is that the frontend will not be served up in a Docker container since the web server (Nginx) currently serves up another app on the same machine.
+  - Or is it? Can I infact follow the standard?
+
+### Docker Network
+- A network needs to be established between the containers for them to direct traffic to each other.
+- This can be done easily by building a bridge traffic with `docker network create -d bridge my-net`
+- After this, the network name can be passed in as a argument to the network parameter on docker container commands or included in the docker compose file.
+  - Alternatively, if no explicit network name is specified in the docker compose file, then upon running the `docker compose up` command (effectively running the compose file) a default network will be created joining the different services specified in the file. 
+
+### Docker Compose
+- Kind of like a parent to the separate docker components built so far.
+- A lot of the details included in the commands for creating the docker images and running the containers can be moved into a single script so that they're displayed in a neat markup language as opposed to a list of (terminal) commands.
+- By familiarising oneself with the [common docker commands](\docker_notes.md), the docker-compose file becomes pretty simple to build.
+- For this script, an image linked to a Docker hub repo is being used (e.g. `holyshiznicks/chat-less-client:latest`)
+  - The `chat-less-client` image using the `latest` tag and sits in the `holyshiznicks` repo.
+  - By using this, we can use the command `docker compose pull` to pull the latest image from Docker hub.
+  - Of course, this means that we need to build the image beforehand and push it to Docker hub.
+  - The idea is that this will be done on the Git servers as part of the Github actions.
+
+### Docker Compose Permissions
+```sh
+>>> docker compose up
+unable to get image 'holyshiznicks/chat-less-server:latest': permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.49/images/holyshiznicks/chat-less-server:latest/json": dial unix /var/run/docker.sock: connect: permission denied
+```
+- Basically running docker commands without `sudo` isn't possible with the current user's permissions.
+- This [stackoverflow article](https://stackoverflow.com/questions/68653051/using-docker-compose-without-sudo-doesnt-work) shows how add the current user to the docker group to remove the need for `sudo`.
+- However, permissions-wise it is basically the same as allowing `sudo` for docker if rootless docker hasn't been set up.
+- This one is used to prevent the need for `sudo` in pipeline scripts.
+
+### Application Logging with Docker
+- Seems like a massive pain with people on the internet suggesting to either using `stderr` or `stdout` streams or some other tool like Loki.
+- We're going to use the volume mounting feature and map a directory on the host machine to a directory on the container that contains all the log files that Winston spits out.
+- It's as easy as including  `- ./server/logs:/app/logs:rw` in the list of volumes to mount in the `server` service.
+
 ## Troubleshooting
 - At this point, navigating to `chat.tenkiame.org` just sends me to the Tenkiame app. 
   - The only detail left out at this point is just that the A record (chat.tenkiame.org) points to the IP address but not to a specific port number.
@@ -412,3 +508,74 @@ const cursor = db.collection('inventory').find({
 - Number 2 can be very quick to investigate. In fact, in this case it was the exact issue. The network settings needed to be adjusted to allow all IPs. All it needed was a couple of clicks after logging in to the dashboard.
 - [16/01/2025] - Socket.io 502 Error (Bad Gateway) encountered on using the app. 
   - Checked pm2 to see that the app wasn't running therefore logged into VM, moved to `chat-less\server` directory and reran `pm2 start index.jsx --name chat-less-backend` to get it started. App was working immediately without a need for refresh.
+- Turns out I accidentally made some commits on a detached head. 
+  - Fortunately, this can be rescued by using `git reflog` to find the hash ID of the latest commit that I had made.
+  - Then by using `git checkout -b my-new-branch abc123` or `git branch my-new-branch abc123` (where `abc123` is the hash ID), I created a new branch which I could merge into my master branch.
+
+### Deploying on Docker
+- Serving up `client/dist` folder and using a container to run the server works seamlessly. The container perfectly replicates the pm2 process.
+- By running both containers, a reverse proxy connection is made to the client container which also uses a web server. It's quite simple, in that it listens to only port open (80) and then serves up the client app files sitting in the nginx folder.
+```nginx
+server{
+    listen 80;
+    root /usr/share/nginx/html;
+    etag on;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+```
+- Meanwhile the main server block on the VM is the following:
+```nginx
+server {
+#    if ($host = chat.tenkiame.org) {
+ #       return 301 https://$host$request_uri;
+  #  } # managed by Certbot
+
+	root /var/www/chat-less/client/dist;
+
+	# Add index.php to the list if you are using PHP
+	index index.html index.htm index.nginx-debian.html;
+
+	server_name chat.tenkiame.org; # managed by Certbot;
+
+	location / {
+		# First attempt to serve request as file, then
+		# as directory, then fall back to displaying a 404.
+		proxy_pass			http://localhost:5173;
+		proxy_http_version	1.1;
+		proxy_set_header	Upgrade $http_upgrade;
+		proxy_set_header	Connection keep-alive;
+		proxy_set_header	Host $host;
+		proxy_cache_bypass	$http_upgrade;
+		proxy_set_header	X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header	X-Forwarded-Proto $scheme;
+	}
+
+	#Socket.IO requests
+	location /socket.io/ {
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header Host $host;
+	
+		proxy_pass http://localhost:4000;
+
+		proxy_http_version 1.1;
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection "upgrade";
+	}
+
+
+    listen [::]:443 ssl; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/chat.tenkiame.org/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/chat.tenkiame.org/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+```
+- This sets up a reverse proxy to forward traffic to the client container.
+- It's supposed to forward traffic using the `/socket.io/` endpoint to the server container but that doesn't seem to be working.
+  - the Socket.IO server is confirmed reachable since `curl "<the server URL>/socket.io/?EIO=4&transport=polling"` returns the appropriate result and curling port 4000 returns the correct pageless page.
+- Perhaps the `location /socket.io/` needs to be in the client container's `nginx.conf file`?
