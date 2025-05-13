@@ -576,6 +576,12 @@ server {
 }
 ```
 - This sets up a reverse proxy to forward traffic to the client container.
-- It's supposed to forward traffic using the `/socket.io/` endpoint to the server container but that doesn't seem to be working.
+- It's supposed to forward traffic using the `/socket.io/` endpoint to the server container but that doesn't seem to be working. 
+  - "ERR_CONNECTION_REFUSED" for the initial socket connection on port 4000 is occurring again.
   - the Socket.IO server is confirmed reachable since `curl "<the server URL>/socket.io/?EIO=4&transport=polling"` returns the appropriate result and curling port 4000 returns the correct pageless page.
 - Perhaps the `location /socket.io/` needs to be in the client container's `nginx.conf file`?
+  - No, that doesn't work.
+- Turns out the problem and solution are exactly the same, the actual culprit was Docker ignoring the `npm run build` command during the image build.
+- Now that the appropriate version of the app is in place, a new problem has occurred: Error 404 for the requesting `https://chat.tenkiame.org/socket.io/?EIO=4&transport=polling`
+  - The culprit was a second server block that I had active as an attempt to solve the previous problem. So I had two location blocks for `location /socket.io/ {}` conflicting for incoming traffic. As anticipated from the beginning, only one server block (virtual host) is needed.
+- Now to resolve the issue of Docker ignoring the nodejs (vite) build command.
