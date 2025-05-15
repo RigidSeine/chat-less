@@ -585,3 +585,7 @@ server {
 - Now that the appropriate version of the app is in place, a new problem has occurred: Error 404 for the requesting `https://chat.tenkiame.org/socket.io/?EIO=4&transport=polling`
   - The culprit was a second server block that I had active as an attempt to solve the previous problem. So I had two location blocks for `location /socket.io/ {}` conflicting for incoming traffic. As anticipated from the beginning, only one server block (virtual host) is needed.
 - Now to resolve the issue of Docker ignoring the nodejs (vite) build command.
+  - The specific build step in the docker file that was ignored was `CMD ["npm", "run", "build"]`.
+  - After a quick Google, the reason why is because I was using it to build files and then copy them over to the next layer.
+  - However, `CMD` is meant for commands to be run AFTER a container is started.
+  - So the solution was simply to use the appropriate instruction [`RUN`](https://docs.docker.com/reference/dockerfile/#run) instead.
