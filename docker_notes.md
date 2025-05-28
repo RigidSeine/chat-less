@@ -18,6 +18,10 @@
 - Runs and starts a container using the specified image.
 - If the image doesn't have an ongoing process, e.g. if the dockerfile commands only builds files, then the container will shut down after it has completed the build process. It is common to start up containers just to perform calculations.
 
+- `docker run [imageName] -detach` or `docker compose up -detach`
+  - Can also use `-d` for short.
+  - Runs containers in the detached mode in the background.
+
 ## Build-run-copy-remove
 `docker buildx build -f "client.dockerfile" -t chat-less-client:v03042025 .`
 `docker run --name sharky chat-less-client:v03042025`
