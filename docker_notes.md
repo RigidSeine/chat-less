@@ -35,7 +35,11 @@
 - Written in YAML.
 
 ## Compose Version
-- This is now obsolete and not required in a compose file.  
+- This is now obsolete and not required in a compose file.
+
+# Docker RUN vs. CMD
+- `RUN` runs the supplied command immediately during the build step it's specified at.
+- `CMD` runs the supplied command after the container starts up.
 
 # Troubleshooting
 `ERROR: error during connect: Head "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/_ping": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.`

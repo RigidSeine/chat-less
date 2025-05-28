@@ -31,5 +31,5 @@ COPY nginx.conf /etc/nginx/conf.d
 #Expose port 80
 EXPOSE 80
 
-#Run nginx in the foreground and start serving web content
+#Run nginx in the foreground and start serving web content after the container starts up
 CMD ["nginx", "-g", "daemon off;"]
