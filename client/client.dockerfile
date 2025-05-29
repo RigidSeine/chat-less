@@ -7,10 +7,10 @@ FROM node:20.19-alpine AS build-stage
 WORKDIR /app 
 
 #Copy the dependency definitions
-COPY package*.json ./
+COPY ./client/package*.json ./
 
 # Install dependencies using the Node command
-RUN npm install
+RUN npm install —include=dev
 
 # Copy over all the code needed
 COPY . .
