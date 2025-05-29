@@ -10,10 +10,10 @@ WORKDIR /app
 COPY ./client/package*.json ./
 
 # Install dependencies using the Node command
-RUN npm install --include=dev
+RUN npm install
 
 # Copy over all the code needed
-COPY . .
+COPY ./client .
 
 # Build the binaries using a pre-defined 'build' script 
 # The files created to go to the ./dist folder
@@ -31,5 +31,5 @@ COPY ./client/nginx.conf /etc/nginx/conf.d
 #Expose port 80
 EXPOSE 80
 
-#Run nginx in the foreground and start serving web content
+#Run nginx in the foreground and start serving web content after the container starts up
 CMD ["nginx", "-g", "daemon off;"]
