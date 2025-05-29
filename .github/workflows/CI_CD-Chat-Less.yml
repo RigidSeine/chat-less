@@ -14,7 +14,7 @@ jobs:
           - dockerfile: ./client/client.dockerfile
             image: hub.docker.com/repositories/${{ vars.DOCKERHUB_USERNAME }}/chat-less-client
             tags: ${{ vars.DOCKERHUB_USERNAME }}/chat-less-client:latest
-          - dockerfile: ./server/dockerfile
+          - dockerfile: ./server/Dockerfile
             image: hub.docker.com/repositories/${{ vars.DOCKERHUB_USERNAME }}/chat-less-server
             tags: ${{ vars.DOCKERHUB_USERNAME }}/chat-less-server:latest
     permissions:
