@@ -7,13 +7,13 @@ FROM node:20.19-alpine
 WORKDIR /app 
 
 #Copy the dependency definitions
-COPY package*.json ./
+COPY /server/package*.json ./
 
 # Install dependencies using the Node command
 RUN npm install
 
 # Copy over all the code needed
-COPY . .
+COPY ./server .
 
 # Expose the port the app the runs in
 EXPOSE 4000
