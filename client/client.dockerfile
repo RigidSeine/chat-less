@@ -26,7 +26,7 @@ FROM nginx:alpine AS prod
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 
 #Copy over the nginx config file sitting in the host's current directory
-COPY nginx.conf /etc/nginx/conf.d
+COPY ./nginx.conf /etc/nginx/conf.d
 
 #Expose port 80
 EXPOSE 80
