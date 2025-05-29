@@ -10,7 +10,7 @@ WORKDIR /app
 COPY ./client/package*.json ./
 
 # Install dependencies using the Node command
-RUN npm install —include=dev
+RUN npm install --include=dev
 
 # Copy over all the code needed
 COPY . .
