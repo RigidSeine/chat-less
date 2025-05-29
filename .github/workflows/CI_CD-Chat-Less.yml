@@ -39,7 +39,3 @@ jobs:
           file: ${{ matrix.dockerfile }}
           push: true
           tags: ${{ matrix.tags }}
-          
-  ssh-and-deploy-containers:
-    runs-on: ubuntu-latest
-    
