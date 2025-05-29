@@ -7,13 +7,13 @@ FROM node:20.19-alpine AS build-stage
 WORKDIR /app 
 
 #Copy the dependency definitions
-COPY package*.json ./
+COPY ./client/package*.json ./
 
 # Install dependencies using the Node command
 RUN npm install
 
 # Copy over all the code needed
-COPY . .
+COPY ./client .
 
 # Build the binaries using a pre-defined 'build' script 
 # The files created to go to the ./dist folder
@@ -26,10 +26,10 @@ FROM nginx:alpine AS prod
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 
 #Copy over the nginx config file sitting in the host's current directory
-COPY nginx.conf /etc/nginx/conf.d
+COPY ./client/nginx.conf /etc/nginx/conf.d
 
 #Expose port 80
 EXPOSE 80
 
-#Run nginx in the foreground and start serving web content
+#Run nginx in the foreground and start serving web content after the container starts up
 CMD ["nginx", "-g", "daemon off;"]
