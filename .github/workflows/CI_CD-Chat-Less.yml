@@ -14,9 +14,11 @@ jobs:
           - dockerfile: ./client/client.dockerfile
             image: hub.docker.com/repositories/${{ vars.DOCKERHUB_USERNAME }}/chat-less-client
             tags: ${{ vars.DOCKERHUB_USERNAME }}/chat-less-client:latest
+            build_context: ./client 
           - dockerfile: ./server/Dockerfile
             image: hub.docker.com/repositories/${{ vars.DOCKERHUB_USERNAME }}/chat-less-server
             tags: ${{ vars.DOCKERHUB_USERNAME }}/chat-less-server:latest
+            build_context: ./server  
     permissions:
       contents: read
       packages: write
@@ -34,7 +36,7 @@ jobs:
       - name: Build and push Chat-Less's Docker images
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ${{ matrix.build_context }}
           file: ${{ matrix.dockerfile }}
           push: true
           tags: ${{ matrix.tags }}
