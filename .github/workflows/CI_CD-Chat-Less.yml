@@ -1,0 +1,45 @@
+name: CI_CD Chat-Less
+on:
+  push:
+    branches:
+    - main
+    - Chat-Less-CI-Test
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dockerfile: ./client/client.dockerfile
+            image: hub.docker.com/repositories/${{ vars.DOCKERHUB_USERNAME }}/chat-less-client
+            tags: ${{ vars.DOCKERHUB_USERNAME }}/chat-less-client:latest
+          - dockerfile: ./server/dockerfile
+            image: hub.docker.com/repositories/${{ vars.DOCKERHUB_USERNAME }}/chat-less-server
+            tags: ${{ vars.DOCKERHUB_USERNAME }}/chat-less-server:latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Chat-Less's Docker images
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ matrix.tags }}
+          
+  ssh-and-deploy-containers:
+    runs-on: ubuntu-latest
+    
