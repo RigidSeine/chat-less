@@ -7,13 +7,13 @@ FROM node:20.19-alpine AS build-stage
 WORKDIR /app 
 
 #Copy the dependency definitions
-COPY ./client/package*.json ./
+COPY package*.json ./
 
 # Install dependencies using the Node command
 RUN npm install
 
 # Copy over all the code needed
-COPY ./client .
+COPY . .
 
 # Build the binaries using a pre-defined 'build' script 
 # The files created to go to the ./dist folder
@@ -26,7 +26,7 @@ FROM nginx:alpine AS prod
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 
 #Copy over the nginx config file sitting in the host's current directory
-COPY ./client/nginx.conf /etc/nginx/conf.d
+COPY nginx.conf /etc/nginx/conf.d
 
 #Expose port 80
 EXPOSE 80
