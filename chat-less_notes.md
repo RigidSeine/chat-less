@@ -589,3 +589,30 @@ server {
   - After a quick Google, the reason why is because I was using it to build files and then copy them over to the next layer.
   - However, `CMD` is meant for commands to be run AFTER a container is started.
   - So the solution was simply to use the appropriate instruction [`RUN`](https://docs.docker.com/reference/dockerfile/#run) instead.
+
+# Github Actions for DevOps
+- Having started with using the root of the repo as the build context (in the Github workflow file), a lot of problems occurred.
+  - Specifically:
+  - ```yaml
+    uses: docker/build-push-action@v6
+        with:
+          context: .
+    ```
+- This messes with a lot of pathing.
+- Errors like `Could not resolve entry module "index.html"` or `buildx failed with: ERROR: failed to solve: process "/bin/sh -c npm run build" did not complete successfully: exit code: 1` will show up when trying to use the Docker build Github action.
+- Therefore, it is recommended to write Dockerfiles with the build context directory in mind instead of the dockerfile's local directory.
+- In this case, the root of the repo is important as the build context because this app also uses `docker compose` and that sits in the root directory (parent directory of both `/client` and `/server`).
+- Having managed to complete the build and push of the images, I tested running them on the server only to get a 404 on using the `/chat` page`. The following errors are examples from the container logs.
+  - `chat-less-client-1  | 2025/05/29 10:25:06 [error] 30#30: *6 open() "/usr/share/nginx/html/chat" failed (2: No such file or directory), client: 172.18.0.1, server: localhost, request: "GET /chat HTTP/1.1", host: "chat.tenkiame.org"`
+  - ```
+    chat-less-server-1  | Error encountered trying to retrieve messages:  Error: querySrv  ENOTFOUND _mongodb._tcp.undefined
+    chat-less-server-1  |     at QueryReqWrap.onresolve [as oncomplete] (node:internal/dns/promises:291:17) {
+    chat-less-server-1  |   errno: undefined,
+    chat-less-server-1  |   code: 'ENOTFOUND',
+    chat-less-server-1  |   syscall: 'querySrv',
+    chat-less-server-1  |   hostname: '_mongodb._tcp.undefined'
+    chat-less-server-1  | }
+    ```
+- Fortunately, managed to go back to previous images by retagging them as `:latest` and bringing the app back to a stable state.
+- Tried to see if it was a Mongodb problem but the cluster is up and all IPs are still allowed.
+- Need to revisit the dockerfiles again.
