@@ -31,6 +31,8 @@ jobs:
         run: |
           touch ./server/.env
           echo MDB_USERNAME=${{ secrets.MDB_USERNAME }} >> ./server/.env
+          echo MDB_PW=${{ secrets.MDB_PW }} >> ./server/.env
+          echo MDB_CLUSTER_NAME=${{ secrets.MDB_CLUSTER_NAME }} >> ./server/.env
           cat ./server/.env
 
       - name: Log in to the Container registry
