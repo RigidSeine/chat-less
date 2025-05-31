@@ -26,6 +26,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      
+      - name: Create server .env file
+        run: |
+          touch ./server/.env
+          echo MDB_USERNAME=${{ secrets.MDB_USERNAME }} >> ./server/.env
+          cat ./server/.env
 
       - name: Log in to the Container registry
         uses: docker/login-action@v3
