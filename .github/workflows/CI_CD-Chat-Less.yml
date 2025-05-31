@@ -11,10 +11,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - dockerfile: ./client/client.dockerfile
-          #   image: hub.docker.com/repositories/${{ vars.DOCKERHUB_USERNAME }}/chat-less-client
-          #   tags: ${{ vars.DOCKERHUB_USERNAME }}/chat-less-client:latest
-          #   build_context: ./client 
+          - dockerfile: ./client/client.dockerfile
+            image: hub.docker.com/repositories/${{ vars.DOCKERHUB_USERNAME }}/chat-less-client
+            tags: ${{ vars.DOCKERHUB_USERNAME }}/chat-less-client:latest
+            build_context: ./client 
           - dockerfile: ./server/Dockerfile
             image: hub.docker.com/repositories/${{ vars.DOCKERHUB_USERNAME }}/chat-less-server
             tags: ${{ vars.DOCKERHUB_USERNAME }}/chat-less-server:latest
