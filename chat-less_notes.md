@@ -615,4 +615,22 @@ server {
     ```
 - Fortunately, managed to go back to previous images by retagging them as `:latest` and bringing the app back to a stable state.
 - Tried to see if it was a Mongodb problem but the cluster is up and all IPs are still allowed.
-- Need to revisit the dockerfiles again.
+- Changed the dockerfiles back to the way they were (using the local directory as the context), and then updated the build context in the Github workflow.
+  - This built successfully but the problem still persists.
+  - Using the exact same dockerfiles, but building the images locally, and pushing them up manually, the app worked as intended.
+    - `docker build -t holyshiznicks/chat-less-client:latest -f ./client/client.dockerfile ./client`
+    - `docker build -t holyshiznicks/chat-less-server:latest -f ./server/Dockerfile ./server`
+- Tested using the latest client image with a stable server image and the app works.
+  - This was done by retagging images and rerunning `docker compose up [-d]`
+  - Could the fault be on the server side instead?
+  - It would seem so, this has been verifed with another stable client image.
+  - It's the lack of .env file in the Github repo. Found by chance staring at the file directory.
+    - Need a better way of logging whether or not a proper connection to the database which is likely why ` Error encountered trying to retrieve messages:  Error: querySrv ENOTFOUND _mongodb._tcp.undefined` exists in the container logs.
+    - The next problem then became "how to use .env file without putting it in the repo?"
+    - This [StackOverflow](https://stackoverflow.com/questions/60176044/how-do-i-use-an-env-file-with-github-actions) thread suggested to make it during the process by storing the contents of the `.env` file in the Github repo secrets.
+    - I used the accepted solution since my `.env` file only has three secrets. It's not the best solution for if you have many more, but I shied away from base64 encoding the contents and storing them as one secret since I can't verify if the Github secret redaction (mentioned [here](https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions#using-secrets)) would work as intended. 
+- This concludes the end of part 1 of the action.
+- After double-checking that fail2ban is running on the server, SSH was then opened to internet.
+- For the rest of the workflow: 
+  - `appleboy/scp-action@v1` was used for copying the `docker-compose.yml` file.
+  - While `appleboy/ssh-action@v1` was used for running the `docker compose` commands.

@@ -2,7 +2,7 @@ name: CI_CD Chat-Less
 on:
   push:
     branches:
-    - Chat-Less-CI-Test
+    - master
 
 jobs:
   build-and-push-image:

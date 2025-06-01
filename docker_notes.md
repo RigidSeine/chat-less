@@ -22,6 +22,10 @@
   - Can also use `-d` for short.
   - Runs containers in the detached mode in the background.
 
+- [`docker image push [OPTIONS] NAME[:TAG]`](https://docs.docker.com/reference/cli/docker/image/push/)
+- Push an image to Docker hub.
+- A registry name can specified if the registry is not Docker hub.
+- 
 ## Build-run-copy-remove
 `docker buildx build -f "client.dockerfile" -t chat-less-client:v03042025 .`
 `docker run --name sharky chat-less-client:v03042025`
