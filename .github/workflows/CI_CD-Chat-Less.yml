@@ -51,16 +51,23 @@ jobs:
   ssh-and-deploy-containers:
     needs: build-and-push-image #Make the jobs run in sequence
     runs-on: ubuntu-latest
-    
     steps:
-      #- name: Copy over Docker Compose file to remote server
-
-      - name: SSH in and deploy new containers
-        uses: appleboy/ssh-action@v1
+      - name: Copy files via SCP
+        uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.HOST_USERNAME }}
           key: ${{ secrets.HOST_KEY }}
-          port: ${{ secrets.HOST_PORT }}
-          script: |
-            scp ./README.md ${{ secrets.HOST_USERNAME }}@${{ secrets.HOST }}:${{ secrets.CHAT_LESS_DIR}}
+          port: ${{ secrets.PORT }}
+          source: "./README.md"
+          target: ${{ secrets.CHAT_LESS_DIR}}
+
+      # - name: Deploy new containers via SSH
+      #   uses: appleboy/ssh-action@v1
+      #   with:
+      #     host: ${{ secrets.HOST }}
+      #     username: ${{ secrets.HOST_USERNAME }}
+      #     key: ${{ secrets.HOST_KEY }}
+      #     port: ${{ secrets.HOST_PORT }}
+      #     script: |
+      #       cd ${{ secrets.CHAT_LESS_DIR}}
