@@ -62,15 +62,16 @@ jobs:
           username: ${{ secrets.HOST_USERNAME }}
           key: ${{ secrets.HOST_KEY }}
           port: ${{ secrets.PORT }}
-          source: "README.md"
+          source: "./docker-compose.yml"
           target: ${{ secrets.CHAT_LESS_DIR}}
 
-      # - name: Deploy new containers via SSH
-      #   uses: appleboy/ssh-action@v1
-      #   with:
-      #     host: ${{ secrets.HOST }}
-      #     username: ${{ secrets.HOST_USERNAME }}
-      #     key: ${{ secrets.HOST_KEY }}
-      #     port: ${{ secrets.HOST_PORT }}
-      #     script: |
-      #       cd ${{ secrets.CHAT_LESS_DIR}}
+      - name: Deploy new containers via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.HOST_USERNAME }}
+          key: ${{ secrets.HOST_KEY }}
+          port: ${{ secrets.HOST_PORT }}
+          script: |
+            docker compose -f ${{ secrets.CHAT_LESS_DIR}}/docker-compose.yml pull -d
+            docker compose -f ${{ secrets.CHAT_LESS_DIR}}/docker-compose.yml up -d
