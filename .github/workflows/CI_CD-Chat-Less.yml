@@ -1,0 +1,77 @@
+name: CI_CD Chat-Less
+on:
+  push:
+    branches:
+    - Chat-Less-CI-Test
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dockerfile: ./client/client.dockerfile
+            image: hub.docker.com/repositories/${{ vars.DOCKERHUB_USERNAME }}/chat-less-client
+            tags: ${{ vars.DOCKERHUB_USERNAME }}/chat-less-client:latest
+            build_context: ./client 
+          - dockerfile: ./server/Dockerfile
+            image: hub.docker.com/repositories/${{ vars.DOCKERHUB_USERNAME }}/chat-less-server
+            tags: ${{ vars.DOCKERHUB_USERNAME }}/chat-less-server:latest
+            build_context: ./server  
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Create server .env file
+        run:  |
+          touch ./server/.env
+          echo MDB_USERNAME=${{ secrets.MDB_USERNAME }} >> ./server/.env
+          echo MDB_PW=${{ secrets.MDB_PW }} >> ./server/.env
+          echo MDB_CLUSTER_NAME=${{ secrets.MDB_CLUSTER_NAME }} >> ./server/.env
+          cat ./server/.env
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Chat-Less's Docker images
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.build_context }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ matrix.tags }}
+          
+  ssh-and-deploy-containers:
+    needs: build-and-push-image #Make the jobs run in sequence
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Copy files via SCP
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.HOST_USERNAME }}
+          key: ${{ secrets.HOST_KEY }}
+          port: ${{ secrets.PORT }}
+          source: "./docker-compose.yml"
+          target: ${{ secrets.CHAT_LESS_DIR}}
+
+      - name: Deploy new containers via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.HOST_USERNAME }}
+          key: ${{ secrets.HOST_KEY }}
+          port: ${{ secrets.HOST_PORT }}
+          script: |
+            docker compose -f ${{ secrets.CHAT_LESS_DIR}}/docker-compose.yml pull
+            docker compose -f ${{ secrets.CHAT_LESS_DIR}}/docker-compose.yml up -d
