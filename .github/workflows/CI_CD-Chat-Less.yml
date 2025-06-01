@@ -63,4 +63,4 @@ jobs:
           key: ${{ secrets.HOST_KEY }}
           port: ${{ secrets.HOST_PORT }}
           script: |
-            cd ${{ secrets.CHAT_LESS_DIR}}
+            scp ./README.md username: ${{ secrets.HOST_USERNAME }}@host:${{ secrets.HOST }}:${{ secrets.CHAT_LESS_DIR}}
