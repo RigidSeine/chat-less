@@ -59,7 +59,7 @@ jobs:
           username: ${{ secrets.HOST_USERNAME }}
           key: ${{ secrets.HOST_KEY }}
           port: ${{ secrets.PORT }}
-          source: "./README.md"
+          source: "README.md"
           target: ${{ secrets.CHAT_LESS_DIR}}
 
       # - name: Deploy new containers via SSH
