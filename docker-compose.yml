@@ -3,12 +3,12 @@ name: chat-less
 services:
   chat-less-client:
     image: holyshiznicks/chat-less-client:latest
-    restart: unless-stopped
+    restart: always
     ports:
       - '5173:80'
   chat-less-server:
     image: holyshiznicks/chat-less-server:latest
-    restart: unless-stopped
+    restart: always
     ports:
       - '4000:4000'
     volumes:
