@@ -1,7 +1,7 @@
 #Create the image based on the official Node image from dockerhub
 #Using alpine for a lightweight version of Node
 #Using this version as its closest to the version used in development
-FROM node:20.19-alpine AS build-stage
+FROM node:24-alpine AS build-stage
 
 #Create the app directory and use this as the working directory for subsequent commands
 WORKDIR /app 
