@@ -3,13 +3,17 @@
 const msgClient = require('./mongodb-create-ypl-client.jsx');
 const logger = require('../utils/winston-logger.jsx');
 
-async function mongodbGetMessages(room){
+
+/* JS does not natively support overloading functions
+Therefore we'll need to work around it by having the MongoDB query (WHERE condition)
+supplied as an argument to the function */
+
+async function mongodbGetMessages(query){
     const client = msgClient();
 
     logger.info('Get Messages Client: ' + client);
 
     //Creating constants to paramterise the query
-    const query = {room: room};
     const projection = {
         username: 1,
         message: 1,

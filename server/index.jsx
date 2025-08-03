@@ -38,8 +38,12 @@ io.on('connection', (socket) => {
         const {username, room}  = data; //Expecting username and room to be returned by the client
         socket.join(room); //Join the user to a socket room
 
+        const query = {
+            room : room
+        };
+
         //Get the last 100 messages sent in the chat room as a findCursor
-        mongodbGetMessages(room)
+        mongodbGetMessages(query)
         .then((last100Messages) => {
             socket.emit('last_100_messages', last100Messages);
          })
@@ -132,5 +136,53 @@ io.on('connection', (socket) => {
 //Set up the port that server is running on
 server.listen(4000, () => 'Server is listening on port 4000!');
 
-console.log('Server running');
 logger.info('Server running');
+
+const api_endpoint_prefix = '/api/v1/';
+
+//Set up a new API endpoint called status and return a JSON response.
+app.get(api_endpoint_prefix + 'Rise', (request, response) => {
+    const rise = {
+        'Rise' : '🐐'
+    };
+    response.status(200).send(rise);
+});
+
+// GET /messages - V1 - Get all messages
+app.get(api_endpoint_prefix + 'messages', (request, response) => {
+    mongodbGetMessages(room => 'javascript')
+    .then((last100Messages) => {
+        response.status(200).json(last100Messages);
+    })
+    .catch((err) =>  { 
+        logger.error('Error encountered trying to retrieve messages during explicit GET request: ', err);
+        response.status(500).json({'Error' : 'Message retrieval failed.'})
+    });
+
+})
+
+// GET /messages - V1 - Get a message using a message ID
+app.get(api_endpoint_prefix + 'messages/:id', (request, response) => {
+    //TODO: Sanitise input
+    //TODO: Handle non-ID (strings, symbols, decimals, etc.)
+    
+    const id = parseInt(request.params.id);
+    const message = NULL; //TODO: Retrieve message
+
+    mongodbGetMessages(room => 'javascript')
+    .then((last100Messages) => {
+        response.status(200).json(last100Messages);
+    })
+    .catch((err) =>  { logger.error('Error encountered trying to retrieve messages during explicit GET request: ', err);});
+
+    if (!message) {
+        response.status(404).json({'Error' : 'Message not found.'});
+    } else {
+        response.status(200).json(last100Messages);
+    }
+})
+
+//TODO: GET /messages for username
+
+// POST / 
+//app.post(api_endpoint_prefix + )
