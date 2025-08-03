@@ -6,7 +6,7 @@ const msgClient = require('./mongodb-create-ypl-client.jsx');
 async function mongodbSaveMessage(message, username, room, createdTime){
     
     const client = msgClient();
-    const sanitisedMessage = sanitiser(message);
+    const sanitisedMessage = sanitiser.sanitiseString(message);
     
     try{
         await client.connect();

@@ -20,7 +20,7 @@ async function mongodbGetMessages(query){
         room: 1,
         createdTime: 1
     };
-    const sortOrder = {createdDate: -1};
+    const sortOrder = {createdTime: -1};
     const recordLimit = 100;
 
     logger.info('100 messages query created.');
