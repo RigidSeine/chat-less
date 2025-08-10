@@ -634,3 +634,14 @@ server {
 - For the rest of the workflow: 
   - `appleboy/scp-action@v1` was used for copying the `docker-compose.yml` file.
   - While `appleboy/ssh-action@v1` was used for running the `docker compose` commands.
+
+# Exposing a REST API
+- Using Express to expose routes for GET and POST methods.
+- Important to sanitise for NoSQL (using a whitelists, sanitising JSON, etc.)
+- Important to implement authorisation of some kind e.g. JSON Web Tokens (JWT)
+  - Requires that a person has an account to authenticate e.g. Username/password.
+
+# Rate-limiting
+- Use Cloudflare's rate-limiting rules.
+  - Dashboard > Security rules > Rate limiting rules
+  - Meant to be protecting individual endpoints, but can apply a general rule using a "/*" URI wildcard.
