@@ -325,6 +325,12 @@ const cursor = db.collection('inventory').find({
 //$and is a valid operator too. This query simply omits it since the additional properties in the object use AND by default.
 ```
 
+## Querying using IDs
+- MongoDB uses `_id` as an identifier field (primary key) for its documents.
+- These come in the form of a 12-byte BSON data type known as an **ObjectId**.
+- To search using these, you need to generate the objectID using `ObjectId.createFromHexString(id)`
+  - The deprecated alternative is `new ObjectID(id)` but this is not recommended.
+
 # Deployment
 ## Nginx Web Server Reverse Proxy Setup And Moving Files
 - Since this leveraging an existing web server, we're going to be modifying the nginx config file to set up a virtual server for Chat Less.

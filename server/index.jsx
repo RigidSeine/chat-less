@@ -10,6 +10,8 @@ const mongodbGetMessages = require ('./services/mongodb-get-messages.jsx');
 const removeUser = require('./utils/remove-user.jsx');
 const getRoomUsers = require('./utils/get-room-users.jsx');
 const logger = require('./utils/winston-logger.jsx');
+const sanitiser = require('./utils/sanitise-input.jsx');
+const { ObjectId } = require('mongodb');
 
 require('dotenv').config();
 
@@ -150,7 +152,7 @@ app.get(api_endpoint_prefix + 'Rise', (request, response) => {
 
 // GET /messages - V1 - Get all messages
 app.get(api_endpoint_prefix + 'messages', (request, response) => {
-    mongodbGetMessages(room => 'javascript')
+    mongodbGetMessages({room : 'javascript'})
     .then((last100Messages) => {
         response.status(200).json(last100Messages);
     })
@@ -163,23 +165,30 @@ app.get(api_endpoint_prefix + 'messages', (request, response) => {
 
 // GET /messages - V1 - Get a message using a message ID
 app.get(api_endpoint_prefix + 'messages/:id', (request, response) => {
-    //TODO: Sanitise input
-    //TODO: Handle non-ID (strings, symbols, decimals, etc.)
+
+    const id = sanitiser.sanitiseString(request.params.id);
     
-    const id = parseInt(request.params.id);
-    const message = NULL; //TODO: Retrieve message
+    //Required for searching via MongoDB IDs
+    const objectId = ObjectId.createFromHexString(id);
 
-    mongodbGetMessages(room => 'javascript')
-    .then((last100Messages) => {
-        response.status(200).json(last100Messages);
+    const inputQuery = {
+        _id : objectId
+    };
+
+    mongodbGetMessages(inputQuery)
+    .then((message) => {
+        if (!message) {
+            response.status(404).json({'Error' : 'Message not found.'});
+        } else {
+            response.status(200).json(message);
+        }
     })
-    .catch((err) =>  { logger.error('Error encountered trying to retrieve messages during explicit GET request: ', err);});
+    .catch((err) =>  { 
+        logger.error('Error encountered trying to retrieve messages during explicit GET request: ', err);
+        response.status(500).json({ 'Error' : 'Unable to retrieve messages during ID GET request.' });
+    });
 
-    if (!message) {
-        response.status(404).json({'Error' : 'Message not found.'});
-    } else {
-        response.status(200).json(last100Messages);
-    }
+
 })
 
 //TODO: GET /messages for username

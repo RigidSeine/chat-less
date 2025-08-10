@@ -6,12 +6,15 @@ const logger = require('../utils/winston-logger.jsx');
 
 /* JS does not natively support overloading functions
 Therefore we'll need to work around it by having the MongoDB query (WHERE condition)
-supplied as an argument to the function */
+supplied as an argument to the function.
+*/
 
 async function mongodbGetMessages(query){
     const client = msgClient();
 
     logger.info('Get Messages Client: ' + client);
+
+    logger.info('Query: ' + JSON.stringify(query));
 
     //Creating constants to paramterise the query
     const projection = {
@@ -23,7 +26,7 @@ async function mongodbGetMessages(query){
     const sortOrder = {createdTime: -1};
     const recordLimit = 100;
 
-    logger.info('100 messages query created.');
+    logger.info('Message query created.');
 
     try{
         await client.connect();
