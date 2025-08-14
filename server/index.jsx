@@ -150,23 +150,23 @@ app.get(api_endpoint_prefix + 'Rise', (request, response) => {
     response.status(200).send(rise);
 });
 
-// GET /messages - V1 - Get all messages
-app.get(api_endpoint_prefix + 'messages', (request, response) => {
-    mongodbGetMessages({room : 'javascript'})
-    .then((last100Messages) => {
-        response.status(200).json(last100Messages);
-    })
-    .catch((err) =>  { 
-        logger.error('Error encountered trying to retrieve messages during explicit GET request: ', err);
-        response.status(500).json({'Error' : 'Message retrieval failed.'})
-    });
+// // GET /messages - V1 - Get all messages
+// app.get(api_endpoint_prefix + 'messages', (request, response) => {
+//     mongodbGetMessages({room : 'javascript'})
+//     .then((last100Messages) => {
+//         response.status(200).json(last100Messages);
+//     })
+//     .catch((err) =>  { 
+//         logger.error('Error encountered trying to retrieve messages during explicit GET request: ', err);
+//         response.status(500).json({'Error' : 'Message retrieval failed.'})
+//     });
 
-})
+// });
 
-// GET /messages - V1 - Get a message using a message ID
-app.get(api_endpoint_prefix + 'messages/:id', (request, response) => {
+// GET /messages/:id - V1 - Get a message using a message ID
+app.get(api_endpoint_prefix + 'messages/', (request, response) => {
 
-    const id = sanitiser.sanitiseString(request.params.id);
+    const id = sanitiser.sanitiseString(request.query.id);
     
     //Required for searching via MongoDB IDs
     const objectId = ObjectId.createFromHexString(id);
@@ -189,9 +189,35 @@ app.get(api_endpoint_prefix + 'messages/:id', (request, response) => {
     });
 
 
-})
+});
 
-//TODO: GET /messages for username
+// //GET /messages/:username - V1  Get all messages using a username
+// app.get(api_endpoint_prefix + 'messages/:username', (request, response) => {
+
+//     const username = sanitiser.sanitiseString(request.params.username);
+    
+//     //Required for searching via MongoDB IDs
+//     const objectUsername = ObjectId.createFromHexString(username);
+
+//     const inputQuery = {
+//         username : objectUsername
+//     };
+
+//     mongodbGetMessages(inputQuery)
+//     .then((message) => {
+//         if (!message) {
+//             response.status(404).json({'Error' : 'Message not found.'});
+//         } else {
+//             response.status(200).json(message);
+//         }
+//     })
+//     .catch((err) =>  { 
+//         logger.error('Error encountered trying to retrieve messages during explicit GET request: ', err);
+//         response.status(500).json({ 'Error' : 'Unable to retrieve messages during the Username GET request.' });
+//     });
+
+
+// });
 
 // POST / 
 //app.post(api_endpoint_prefix + )
