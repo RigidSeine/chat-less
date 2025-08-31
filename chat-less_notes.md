@@ -647,6 +647,36 @@ server {
 - Important to implement authorisation of some kind e.g. JSON Web Tokens (JWT)
   - Requires that a person has an account to authenticate e.g. Username/password.
 
+## Validation
+- We're using [Yup](https://www.npmjs.com/package/yup) for this one.
+- Create a schema that defines all the expected parameters and how they should behave.
+- **ALL OPTIONAL PARAMETERS** - yup.when() is required for each parameter if all parameters are optional.
+  - Also recommended that any empty strings are explicitly transformed and return as null values since there is a chance that the value is morphed and the previous value is submitted.
+  - Additionally, when `yup.object().shape()` is used to define the shape of the schema explicitly, defining the dependencies as an array or array of arrays is necessary for letting yup know which parameter depends on which. The order in the array does not matter.
+e.g. More examples [here](https://github.com/jquense/yup/issues/193) and [here](https://github.com/jquense/yup/issues/176#issuecomment-369925782)
+```jsx
+  yup.
+    .object()
+    .shape({ 
+        id: yup
+            .string()
+            //when() is required if all parameters are optional
+            .when('id', (value) => { 
+                //Define your logic for id here... 
+            }
+            })
+            .notRequired()
+        
+        ,username: yup
+                    .string()
+                    .notRequired()
+    }, 
+    [
+        ['id', 'id'] //Id depends on itself so it's paired with itself.
+    ])
+```
+- **UNKNOWN PARAMETERS** - If you want to explicitly test against unknown parameters, then don't supply `stripUnknown: true` as an option for `schema.validateSync()`, otherwise it will keep testing against known parameters and throw those errors as opposed to throwing an unknown parameter error.
+
 # Rate-limiting
 - Use Cloudflare's rate-limiting rules.
   - Dashboard > Security rules > Rate limiting rules
