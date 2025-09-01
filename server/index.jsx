@@ -12,6 +12,8 @@ const getRoomUsers = require('./utils/get-room-users.jsx');
 const logger = require('./utils/winston-logger.jsx');
 const sanitiser = require('./utils/sanitise-input.jsx');
 const { ObjectId } = require('mongodb');
+const { queryMessageSchema } = require('./utils/validation-schemas/queryMessageSchema.jsx');
+const objectUtils = require('./utils/object-utilities.jsx');
 
 require('dotenv').config();
 
@@ -143,14 +145,14 @@ logger.info('Server running');
 const api_endpoint_prefix = '/api/v1/';
 
 //Set up a new API endpoint called status and return a JSON response.
-app.get(api_endpoint_prefix + 'Rise', (request, response) => {
-    const rise = {
-        'Rise' : '🐐'
-    };
-    response.status(200).send(rise);
-});
+// app.get(api_endpoint_prefix + 'Rise', (request, response) => {
+//     const rise = {
+//         'Rise' : '🐐'
+//     };
+//     response.status(200).send(rise);
+// });
 
-// // GET /messages - V1 - Get all messages
+// GET /messages - V1 - Get all messages
 // app.get(api_endpoint_prefix + 'messages', (request, response) => {
 //     mongodbGetMessages({room : 'javascript'})
 //     .then((last100Messages) => {
@@ -161,33 +163,55 @@ app.get(api_endpoint_prefix + 'Rise', (request, response) => {
 //         response.status(500).json({'Error' : 'Message retrieval failed.'})
 //     });
 
-// });
+//  });
 
 // GET /messages/:id - V1 - Get a message using a message ID
 app.get(api_endpoint_prefix + 'messages/', (request, response) => {
 
-    const id = sanitiser.sanitiseString(request.query.id);
+    //const id = sanitiser.sanitiseString(request.query.id);
+    //const validatedId = queryMessageSchema.validateSync(id, { abortEarly: true, stripUnknown: true});
+
+    logger.info('Start GET /messages.');
+
+    const input = sanitiser.santiseObject(request.query);
     
-    //Required for searching via MongoDB IDs
-    const objectId = ObjectId.createFromHexString(id);
+    try {
+        logger.info(JSON.stringify(input));
+        const validatedInput = queryMessageSchema.validateSync(input, {});
+        
+        logger.info('Validation complete.');
 
-    const inputQuery = {
-        _id : objectId
-    };
+        var inputQuery = {};
 
-    mongodbGetMessages(inputQuery)
-    .then((message) => {
-        if (!message) {
-            response.status(404).json({'Error' : 'Message not found.'});
-        } else {
-            response.status(200).json(message);
+        //Creating ObjectId is required for searching via MongoDB IDs
+        if (validatedInput.id) { inputQuery._id = ObjectId.createFromHexString(validatedInput.id); }
+        if (validatedInput.username) { inputQuery.username = validatedInput.username; }
+
+        //Retrieve no results if no parameters are passed in.
+        if (objectUtils.hasOnlyNullPropertyValues(inputQuery)){
+            inputQuery._id = -1;
         }
-    })
-    .catch((err) =>  { 
-        logger.error('Error encountered trying to retrieve messages during explicit GET request: ', err);
-        response.status(500).json({ 'Error' : 'Unable to retrieve messages during ID GET request.' });
-    });
-
+        
+        mongodbGetMessages(inputQuery)
+        .then((message) => {
+            if (message.length == 0) {
+                response.status(404).json({'Error' : 'No message found.'});
+            } else {
+                response.status(200).json(message);
+            }
+        })
+        .catch((err) =>  { 
+            logger.error('Error encountered trying to retrieve messages during explicit GET request: ', err);
+            response.status(500).json({ 'Error' : 'Unable to retrieve messages during ID GET request.' });
+        });        
+    }
+    catch (error) {
+        logger.error(error.toString());
+        return response.status(422).json({errors: error.errors});
+    }
+    finally {
+        logger.info("GET messages complete.");
+    }
 
 });
 
