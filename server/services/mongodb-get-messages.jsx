@@ -41,7 +41,10 @@ async function mongodbGetMessages(query){
 
         const resultsArray = await findResultsCursor.toArray();
 
-        await logger.info(resultsArray[0]);
+        //Copy out the first element for logging pass it in as a second argument
+        // to avoid mutating the object.
+        const resultCopy = await resultsArray[0]
+        await logger.info('Result retrieved.', { resultCopy });
 
         //Return the results as an array to append it to the messagesReceived state array later
         //toArray needs to be awaited as well otherwise it'll run synchronously before the query is complete

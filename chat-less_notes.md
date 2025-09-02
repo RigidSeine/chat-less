@@ -517,6 +517,8 @@ unable to get image 'holyshiznicks/chat-less-server:latest': permission denied w
 - Turns out I accidentally made some commits on a detached head. 
   - Fortunately, this can be rescued by using `git reflog` to find the hash ID of the latest commit that I had made.
   - Then by using `git checkout -b my-new-branch abc123` or `git branch my-new-branch abc123` (where `abc123` is the hash ID), I created a new branch which I could merge into my master branch.
+- When using Winston logging to log an object, the object would get mutated with the logging level and timestamp when using `logger.info(object)`.
+  - This can be avoided by simply passing the object as a second argument while the first argument is the message. E.g. `logger.info('Object retrieved', { object })`.
 
 ### Deploying on Docker
 - Serving up `client/dist` folder and using a container to run the server works seamlessly. The container perfectly replicates the pm2 process.
