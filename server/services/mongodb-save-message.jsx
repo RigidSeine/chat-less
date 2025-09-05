@@ -7,6 +7,7 @@ async function mongodbSaveMessage(message, username, room, createdTime){
     
     const client = msgClient();
     const sanitisedMessage = sanitiser.sanitiseString(message);
+    const sanitisedUsername = sanitiser.sanitiseString(username);
     
     try{
         await client.connect();
@@ -16,7 +17,7 @@ async function mongodbSaveMessage(message, username, room, createdTime){
         
         const result = await collection.insertOne({
             message: sanitisedMessage,
-            username: username,
+            username: sanitisedUsername,
             room: room,
             createdTime: createdTime
         });

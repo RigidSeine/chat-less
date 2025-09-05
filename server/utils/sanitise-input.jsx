@@ -1,6 +1,7 @@
 //./server/utils/sanitise-input.jsx
 
 const mapObject = require('./map-object.jsx');
+const logger = require('./winston-logger.jsx');
 
 function sanitiseString(str) {
     if (!str) return;
@@ -14,6 +15,8 @@ function sanitiseString(str) {
 }
 
 function santiseObject(obj) {
+    logger.info('Sanitising object', { obj });
+
     if (typeof(obj) === 'object' && !!!Array.isArray(obj)) {
         return mapObject(obj, sanitiseString);
     }
