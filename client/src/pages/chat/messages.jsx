@@ -34,7 +34,11 @@ const Messages = ({ socket }) => { //Unpack the socket property from the passed 
     //Display last 100 messages event
     useEffect(() => {
         socket.on('last_100_messages', (last100Messages) => {
+
+            //Array gets mutated after mongodbGetMessages() returns so sort messages on client-side
+            last100Messages.sort((a, b) => a.createdTime - b.createdTime);
             setMessagesReceived((state) => [...last100Messages, ...state]);
+
         });
 
         return () => socket.off('last_100_messages');
