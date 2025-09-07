@@ -13,6 +13,7 @@ const logger = require('./utils/winston-logger.jsx');
 const sanitiser = require('./utils/sanitise-input.jsx');
 const { ObjectId } = require('mongodb');
 const { queryMessageSchema } = require('./utils/validation-schemas/queryMessageSchema.jsx');
+const { createMessageSchema } = require('./utils/validation-schemas/createMessageSchema.jsx');
 const objectUtils = require('./utils/object-utilities.jsx');
 
 require('dotenv').config();
@@ -142,31 +143,22 @@ server.listen(4000, () => 'Server is listening on port 4000!');
 
 logger.info('Server running');
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true}));
+
+/************  REST API *****************/
 const api_endpoint_prefix = '/api/v1/';
 
 //Set up a new API endpoint called status and return a JSON response.
-// app.get(api_endpoint_prefix + 'Rise', (request, response) => {
-//     const rise = {
-//         'Rise' : '🐐'
-//     };
-//     response.status(200).send(rise);
-// });
+app.get(api_endpoint_prefix + 'Rise', (request, response) => {
+    const rise = {
+        'Rise' : '🐐'
+    };
+    response.status(200).send(rise);
+});
 
-// GET /messages - V1 - Get all messages
-// app.get(api_endpoint_prefix + 'messages', (request, response) => {
-//     mongodbGetMessages({room : 'javascript'})
-//     .then((last100Messages) => {
-//         response.status(200).json(last100Messages);
-//     })
-//     .catch((err) =>  { 
-//         logger.error('Error encountered trying to retrieve messages during explicit GET request: ', err);
-//         response.status(500).json({'Error' : 'Message retrieval failed.'})
-//     });
-
-//  });
-
-// GET /messages/:id - V1 - Get a message using a message ID
-app.get(api_endpoint_prefix + 'messages/', (request, response) => {
+// GET /messages?id&username - V1 - Get a message using a message ID and/or a username
+app.get(api_endpoint_prefix + 'messages', (request, response) => {
 
     //const id = sanitiser.sanitiseString(request.query.id);
     //const validatedId = queryMessageSchema.validateSync(id, { abortEarly: true, stripUnknown: true});
@@ -195,14 +187,14 @@ app.get(api_endpoint_prefix + 'messages/', (request, response) => {
         mongodbGetMessages(inputQuery)
         .then((message) => {
             if (message.length == 0) {
-                response.status(404).json({'Error' : 'No message found.'});
+                response.status(404).json({Error : 'No message found.'});
             } else {
                 response.status(200).json(message);
             }
         })
         .catch((err) =>  { 
             logger.error('Error encountered trying to retrieve messages during explicit GET request: ', err);
-            response.status(500).json({ 'Error' : 'Unable to retrieve messages during ID GET request.' });
+            response.status(500).json({ Error : `Unable to retrieve messages during ID GET request. ${err}` });
         });        
     }
     catch (error) {
@@ -215,33 +207,30 @@ app.get(api_endpoint_prefix + 'messages/', (request, response) => {
 
 });
 
-// //GET /messages/:username - V1  Get all messages using a username
-// app.get(api_endpoint_prefix + 'messages/:username', (request, response) => {
+// POST /messages - V1 - Send a message using a request
+app.post(api_endpoint_prefix + 'messages', (request, response) => {
 
-//     const username = sanitiser.sanitiseString(request.params.username);
-    
-//     //Required for searching via MongoDB IDs
-//     const objectUsername = ObjectId.createFromHexString(username);
+    logger.info('Start POST /messages.');
 
-//     const inputQuery = {
-//         username : objectUsername
-//     };
+    const body = sanitiser.santiseObject(request.body);
 
-//     mongodbGetMessages(inputQuery)
-//     .then((message) => {
-//         if (!message) {
-//             response.status(404).json({'Error' : 'Message not found.'});
-//         } else {
-//             response.status(200).json(message);
-//         }
-//     })
-//     .catch((err) =>  { 
-//         logger.error('Error encountered trying to retrieve messages during explicit GET request: ', err);
-//         response.status(500).json({ 'Error' : 'Unable to retrieve messages during the Username GET request.' });
-//     });
+    logger.info('POST /Messages Request received and sanitised', { body });
 
+    try {
+        const data = createMessageSchema.validateSync(body);
 
-// });
-
-// POST / 
-//app.post(api_endpoint_prefix + )
+        mongodbSaveMessage(data.message, data.username, data.room, Date.now())
+        .then(() => response.status(201).json({message: 'Message sent.'}))
+        .catch((err) => {
+            logger.error(`Error encountered trying to send a message during POST request. ${err}`);
+            response.status(500).json({Error: `Internal server error encountered. Whoops! ${err}` });
+        })
+    } 
+    catch (error) {
+        logger.error(error.toString());
+        return response.status(422).json({errors: error.errors});
+    }
+    finally {
+        logger.info("POST messages complete.");
+    }
+});

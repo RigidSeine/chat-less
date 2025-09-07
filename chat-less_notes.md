@@ -649,6 +649,20 @@ server {
 - Important to implement authorisation of some kind e.g. JSON Web Tokens (JWT)
   - Requires that a person has an account to authenticate e.g. Username/password.
 
+## GET request
+- Important to define how you want to get a resource for each endpoint.
+- `Messages` for example, was originally going to use two separate endpoints `{id}` and `{username}` but it makes more sense to combine them into a single query string - `messages?id=&username=`
+- Forming a GET request is straightforward, but validating it properly is where the work lies.
+
+## POST request
+- Similar to GET, in that most of the work is validating it.
+- However, for `Express`, certain middleware needs to be enabled in order to parse POST requests properly.
+```js
+app.use(express.json());
+app.use(express.urlencoded({ extended: true}));
+```
+- The first line allows for JSON in the request bodies while the second one allows for url-encoded data in request bodies.
+
 ## Validation
 - We're using [Yup](https://www.npmjs.com/package/yup) for this one.
 - Create a schema that defines all the expected parameters and how they should behave.

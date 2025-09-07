@@ -1,6 +1,5 @@
 const yup =  require('yup');
 const pattern_matching = require('../pattern-matching.jsx')
-const logger = require('../winston-logger.jsx')
 
 exports.queryMessageSchema = yup
     .object()
