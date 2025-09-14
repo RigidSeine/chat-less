@@ -11,10 +11,9 @@ const objectUtils = require('../utils/object-utilities.jsx');
 const router = express.Router();
 
 /************  REST API *****************/
-const api_endpoint_prefix = '/api/v1/';
 
 //Set up a new API endpoint called status and return a JSON response.
-router.get(api_endpoint_prefix + 'Rise', (request, response) => {
+router.get('/Rise', (request, response) => {
     const rise = {
         'Rise' : '🐐'
     };
@@ -22,10 +21,49 @@ router.get(api_endpoint_prefix + 'Rise', (request, response) => {
 });
 
 // GET /messages?id&username - V1 - Get a message using a message ID and/or a username
-router.get(api_endpoint_prefix + 'messages', (request, response) => {
+router.get('/messages', (request, response) => {
+/* #swagger.parameters['id'] = {
+    in: 'query',
+    description: 'MongoDB ObjectID of the message. Required if username is null.',                   
+    required: 'false',                     
+    type: 'string'
+} */
 
-    //const id = sanitiser.sanitiseString(request.query.id);
-    //const validatedId = queryMessageSchema.validateSync(id, { abortEarly: true, stripUnknown: true});
+/* #swagger.parameters['username'] = {
+    in: 'query',                         
+    description: 'Username (author) of the message(s). Required if id is null.',                   
+    required: 'false',                     
+    type: 'string'  
+} */
+
+/*
+#swagger.responses[200] = {
+    description: 'One or more messages that match the query.',
+    schema: {
+        "_id": "688efa591e8d464022a54f7a",
+        "message": "Kia ora World",
+        "username": "Bob",
+        "room": "express",
+        "createdTime": 1002625199000
+    }
+} */
+
+/*
+#swagger.responses[404] = {
+    description: 'No message found.',
+} */
+
+/*
+#swagger.responses[422] = {
+    description: 'List of input validation errors.',
+} */
+
+/*
+#swagger.responses[500] = {
+    description: 'Unable to retrieve messages during ID GET request. ${err}',
+} */
+
+
 
     logger.info('Start GET /messages.');
 
@@ -72,7 +110,32 @@ router.get(api_endpoint_prefix + 'messages', (request, response) => {
 });
 
 // POST /messages - V1 - Send a message using a request
-router.post(api_endpoint_prefix + 'messages', (request, response) => {
+router.post('/messages', (request, response) => {
+
+/* #swagger.parameters['body'] = {
+    in: 'body',
+    description: 'The message you want to send.',                                        
+    schema: {    
+        "message": "Kia ora",
+        "room": "javascript",
+        "username": "Bob"
+    }
+} */
+
+/*
+#swagger.responses[201] = {
+    description: 'Message created successfully.',
+} */
+
+/*
+#swagger.responses[422] = {
+    description: 'List of input validation errors.',
+} */
+
+/*
+#swagger.responses[500] = {
+    description: 'Internal server error encountered. Whoops! ${err}',
+} */
 
     logger.info('Start POST /messages.');
 

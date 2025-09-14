@@ -693,6 +693,19 @@ e.g. More examples [here](https://github.com/jquense/yup/issues/193) and [here](
 ```
 - **UNKNOWN PARAMETERS** - If you want to explicitly test against unknown parameters, then don't supply `stripUnknown: true` as an option for `schema.validateSync()`, otherwise it will keep testing against known parameters and throw those errors as opposed to throwing an unknown parameter error.
 
+## Versioning
+- See this [dev.to](https://dev.to/backplane/api-versioning-with-nodejs-express-pdd) page
+
+# Documenting a REST API with Swagger
+- Since this project uses node.js, we can use the appropriate node.js packages to automate some of the documentation.
+
+## Swagger UI Express
+- Allows us to serve up a Swagger document on our website.
+
+## Swagger Autogen
+- Automatically identifies relevant parts of the REST API (middleware, endpoints, etc.) and creates a swagger.json file for us.
+- Parameters and Responses can be defined under the individual routes.
+
 # Rate-limiting
 - Use Cloudflare's rate-limiting rules.
   - Dashboard > Security rules > Rate limiting rules

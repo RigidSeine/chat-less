@@ -11,13 +11,15 @@ const removeUser = require('./utils/remove-user.jsx');
 const getRoomUsers = require('./utils/get-room-users.jsx');
 const logger = require('./utils/winston-logger.jsx');
 const messageRouter = require('./routes/messages.jsx');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
 
 require('dotenv').config();
 
 app.use(cors()); //Adds cors middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
-app.use(messageRouter);
+app.use('/api/v1/', messageRouter);
 
 const server = http.createServer(app);
 
@@ -141,3 +143,6 @@ io.on('connection', (socket) => {
 server.listen(4000, () => 'Server is listening on port 4000!');
 
 logger.info('Server running');
+
+//For REST API
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));

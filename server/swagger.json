@@ -1,0 +1,117 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Chat Less API",
+    "description": "Forget websockets, interact with Chat Less using HTTP requests instead.",
+    "version": "1.0.0"
+  },
+  "host": "chat.tenkiame.org",
+  "basePath": "/api/v1/",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "paths": {
+    "/messages": {
+      "get": {
+        "description": "Retrieve messages from the Chat Less database.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "MongoDB ObjectID of the message. Required if username is null.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "username",
+            "in": "query",
+            "description": "Username (author) of the message(s). Required if id is null.",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One or more messages that match the query.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "example": "688efa591e8d464022a54f7a"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Kia ora World"
+                },
+                "username": {
+                  "type": "string",
+                  "example": "Bob"
+                },
+                "room": {
+                  "type": "string",
+                  "example": "express"
+                },
+                "createdTime": {
+                  "type": "number",
+                  "example": 1002625199000
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "No message found."
+          },
+          "422": {
+            "description": "List of input validation errors."
+          },
+          "500": {
+            "description": "Unable to retrieve messages during ID GET request. ${err}"
+          }
+        }
+      },
+      "post": {
+        "description": "Send a message to the Chat Less database.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "The message you want to send.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Kia ora"
+                },
+                "room": {
+                  "type": "string",
+                  "example": "javascript"
+                },
+                "username": {
+                  "type": "string",
+                  "example": "Bob"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "One or more messages that match the query."
+          },
+          "422": {
+            "description": "List of input validation errors."
+          },
+          "500": {
+            "description": "Internal server error encountered. Whoops! ${err}"
+          }
+        }
+      }
+    }
+  }
+}
