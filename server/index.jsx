@@ -10,7 +10,7 @@ const mongodbGetMessages = require ('./services/mongodb-get-messages.jsx');
 const removeUser = require('./utils/remove-user.jsx');
 const getRoomUsers = require('./utils/get-room-users.jsx');
 const logger = require('./utils/winston-logger.jsx');
-const messageRouter = require('./routes/messages.jsx');
+//const messageRouter = require('./routes/messages.jsx');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
 
@@ -19,7 +19,9 @@ require('dotenv').config();
 app.use(cors()); //Adds cors middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
-app.use('/api/v1/', messageRouter);
+
+//Turning off until secured and nginx reconfigured as API Gateway
+//app.use('/api/v1/', messageRouter);
 
 const server = http.createServer(app);
 
