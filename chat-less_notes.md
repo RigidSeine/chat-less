@@ -642,6 +642,8 @@ server {
 - For the rest of the workflow: 
   - `appleboy/scp-action@v1` was used for copying the `docker-compose.yml` file.
   - While `appleboy/ssh-action@v1` was used for running the `docker compose` commands.
+    - When using `ufw`'s LIMIT rule on port 22 for tcp connections, `appleboy/ssh-action@v1` ran into a connection timeout error: `drone-scp error: dial tcp ***:***: i/o timeout`.
+    - Therefore, sticking to fail2ban as the limiting factor.
 
 # Exposing a REST API
 - Using Express to expose routes for GET and POST methods.
