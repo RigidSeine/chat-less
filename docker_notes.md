@@ -68,3 +68,16 @@
 `unable to get image 'holyshiznicks/chat-less-client:latest': error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.47/images/holyshiznicks/chat-less-client:latest/json": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.`
 - Found on running `docker compose up` or `docker compose pull`
 - Fix it by starting the Docker engine.
+
+`5.413 /usr/share/dotnet/sdk/8.0.417/Microsoft.Common.CurrentVersion.targets(5321,5): error MSB3021: Unable to copy file "/src/TenkiAme/obj/Release/net8.0/apphost" to "/app/build/TenkiAme". Access to the path '/app/build/TenkiAme' is denied. [/src/TenkiAme/TenkiAme.csproj]`
+- Problem encountered during build stage in Docker.
+- Issue was due to using user called `app`, and `app` doesn't have enough permissions to create directories.
+  - Except it wasn't
+  - It was actually having too many parent folders in the COPY commands leading to multiple `TenkiAme.csproj` files and multiple `TenkiAme` folders.
+  - So getting the folder structure right finally fixed it.
+
+`no configuration file provided: not found`
+- During `docker compose up`. 
+- The command by default looks for a `docker-compose.yml` file.
+- So if you changed the name of the compose file supply the additional `-f` argument.
+  - `docker compose -f <docker-compose-filename.yml> up`
