@@ -1,20 +1,31 @@
 //server/index.jsx
 
+// Express
 const express = require('express');
-const app = express();
-http = require('http');
+const http = require('http');
 const cors = require('cors');
+
+//Socket.io
 const {Server} = require('socket.io');
 const mongodbSaveMessage = require ('./services/mongodb-save-message.jsx');
 const mongodbGetMessages = require ('./services/mongodb-get-messages.jsx');
 const removeUser = require('./utils/remove-user.jsx');
 const getRoomUsers = require('./utils/get-room-users.jsx');
+
+//Logger
 const logger = require('./utils/winston-logger.jsx');
+
 //const messageRouter = require('./routes/messages.jsx');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
 
-require('dotenv').config();
+// Env
+const env = require('dotenv')
+
+// Load env
+env.config();
+
+const app = express();
 
 app.use(cors()); //Adds cors middleware
 app.use(express.json());
@@ -23,13 +34,18 @@ app.use(express.urlencoded({ extended: true}));
 //Turning off until secured and nginx reconfigured as API Gateway
 //app.use('/api/v1/', messageRouter);
 
+const corsConfig = {
+    origin: [
+         'http://localhost:5173'
+        ,'https://chat.tenkiame.org'
+    ], //Add our client to the whitelist for CORS
+    methods: ['GET', 'POST']
+}
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
-    cors: {
-        origin: ['http://localhost:5173', 'https://chat.tenkiame.org'], //Add our client to the whitelist for CORS
-        methods: ['GET', 'POST']
-    }
+    corsConfig
 });
 
 const chatbot = 'ChatBot'; //Chatbot for making room-wide announcements
